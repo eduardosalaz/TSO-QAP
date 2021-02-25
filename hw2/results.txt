@@ -1,0 +1,58 @@
+1million items, weight= 16500000
+wmin = 30, wmax = 80
+vmin = 20, vmax = 60
+    KpInstance1.dat:
+        Heur1: 16431321, residual weight = 1
+	Heur2: 16507094, rw = 22
+	Heur3: 18186518, rw = 27
+    KpInstance2.dat:
+	Heur1: 16418925, rw = 2
+        Heur2: 16502970, rw = 18
+        Heur3: 18163707, rw = 0
+    KpInstance3.dat:
+        Heur1: 16432742, rw = 9
+        Heur2: 16507555, rw = 34
+        Heur3: 18187123, rw = 16
+    KpInstance4.dat:
+        Heur1: 16437878, rw = 11
+        Heur2: 16505326, rw = 7
+        Heur3: 18184068, rw = 25
+    KpInstance5.dat:
+        Heur1: 16424086, rw = 25
+        Heur2: 16491303, rw = 12
+        Heur3: 18167854, rw = 6
+slowest is by far Heur3 taking around 2.7~ seconds
+
+100 items, weight = 1350
+wmin = 30, wmax = 60
+vmin = 20, vmax = 50
+    KpInstance1.dat:
+        Heur1: 1311, rw = 27
+	Heur2: 1313, rw = 39
+	Heur3: 1443, rw = 7
+    KpInstance2.dat:
+	Heur1: 1360, rw = 6
+        Heur2: 1302, rw = 20
+        Heur3: 1440, rw = 5
+    KpInstance3.dat:
+        Heur1: 1387, rw = 22
+        Heur2: 1311, rw = 20
+        Heur3: 1478, rw = 12
+    KpInstance4.dat:
+        Heur1: 1453, rw = 18
+        Heur2: 1415, rw = 24
+        Heur3: 1540, rw = 13
+    KpInstance5.dat:
+        Heur1: 1343, rw = 12
+        Heur2: 1275, rw = 24
+        Heur3: 1409, rw = 22
+slowest is by far Heur3 taking around 1~ second
+
+10 items, weight = 75
+wmin = 20, wmax = 30
+vmin = 20, vmax = 30
+    KpInstance1.dat:
+        Heur1: 60, rw = 19
+	Heur2: 66, rw = 0
+	Heur3: 60, rw = 19
+slowest is by far Heur3 taking around 1~ second
