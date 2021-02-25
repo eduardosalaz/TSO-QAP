@@ -10,18 +10,17 @@ function main()
     input_array = nothing
     ratio = values./weights # gets ratio of vᵢ/wᵢ
     M = hcat(values, weights, ratio) # concatenates Three Vectors on a 2D Array
-    both = sortslices(M,dims=1,by=x->(x[3],x[1],x[2]),rev=true)
+    Φ = sortslices(M,dims=1,by=x->(x[3],x[1],x[2]),rev=true)
     # sort first by col3, the others aren't relevant
     # biggest ratios go on top
     M = nothing
-    both_flattened = both[:]
-    both = nothing
-    len = length(both_flattened)
+    Φ = Φ[:]
+    len = length(Φ)
     len = floor(Int64, len/3) # get the 1/3rd point
-    V̄ = both_flattened[1:len]
+    V̄ = Φ[1:len]
     # obviously the first third of the 1d array represents the values
-    Weights = both_flattened[len+1:2*len] # second third is weights
-    both_flattened = nothing
+    Weights = Φ[len+1:2*len] # second third is weights
+    Φ = nothing
     V̄ = round.(Int, V̄) # faster while working with integers
     Weights = round.(Int, Weights)
     global W̄ = W

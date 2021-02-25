@@ -14,18 +14,17 @@ function main()
     # efficient
     input_array = nothing # cleans up memory
     M = hcat(values, weights) # concatenates both Vectors on a 2D Array
-    both = sortslices(M,dims=1,by=x->(x[1],-x[2]),rev=true)
+    Φ = sortslices(M,dims=1,by=x->(x[1],-x[2]),rev=true)
     # sort first by col1 then col2
     # this is done to tiebreak same values
     M = nothing
-    both_flattened = both[:] # flattens the 2d array to a 1d
-    both = nothing
-    len = length(both_flattened)
+    Φ = Φ[:] # flattens the 2d array to a 1d
+    len = length(Φ)
     len = floor(Int64, len/2) # get the half point
-    V̄ = both_flattened[1:len]
+    V̄ = Φ[1:len]
     # obviously the first half of the 1d array represents the values
-    Weights = both_flattened[len+1:end] # second half is weights
-    both_flattened = nothing
+    Weights = Φ[len+1:end] # second half is weights
+    Φ = nothing
     global W̄ = W # so they can be used inside the while
     global X = 0
     while !isempty(V̄)

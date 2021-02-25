@@ -9,17 +9,16 @@ function main()
     weights = input_array[2:end, 2]
     input_array = nothing
     M = hcat(values, weights)
-    both = sortslices(M,dims=1,by=x->(-x[2],x[1]),rev=true)
+    Φ = sortslices(M,dims=1,by=x->(-x[2],x[1]),rev=true)
     # sort first by col2 then col1
     # this is done to tiebreak same weights
     M = nothing
-    both_flattened = both[:]
-    both = nothing
-    len = length(both_flattened)
+    Φ = Φ[:]
+    len = length(Φ)
     len = floor(Int64, len/2)
-    V̄ = both_flattened[1:len]
-    Weights = both_flattened[len+1:end]
-    both_flattened = nothing
+    V̄ = Φ[1:len]
+    Weights = Φ[len+1:end]
+    Φ = nothing
     global W̄ = W
     global X = 0
     while !isempty(V̄)
