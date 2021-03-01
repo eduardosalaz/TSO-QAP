@@ -3,7 +3,13 @@ using DelimitedFiles # readdlm
 function main()
     file_name = ARGS[1] # Julia is a 1-index based language
     # file_name = "10\\KpInstance1.dat"
-    input_array = readdlm(file_name, ' ', Int, '\n') # reads a 2d array from file
+    try
+        input_array = readdlm(file_name, ' ', Int, '\n') # reads a 2d array from file
+    catch
+        @error "Input file does not exist"
+        return
+    end # try
+
     n = input_array[1, 1] # self explanatory
     W = input_array[1, 2]
     values = input_array[2:end, 1] # generates a Vector from 2nd row to end

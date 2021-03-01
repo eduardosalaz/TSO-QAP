@@ -1,7 +1,12 @@
 using DelimitedFiles
 
 function main()
-    file_name = ARGS[1]
+    try
+        input_array = readdlm(file_name, ' ', Int, '\n') # reads a 2d array from file
+    catch
+        @error "Input file does not exist"
+        return
+    end # try
     input_array = readdlm(file_name, ' ', Int, '\n')
     n = input_array[1, 1]
     W = input_array[1, 2]
