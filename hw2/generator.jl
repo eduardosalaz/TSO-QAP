@@ -1,5 +1,5 @@
-using DelimitedFiles
-try
+using DelimitedFiles # writedlm
+try # try catch for bad input that cant be parsed
     print("Number of elements: ")
     n = parse(Int64, readline())
     if n > 0
@@ -18,13 +18,13 @@ try
                 if k > 0
                     W = 0.3*(n*(wmin+wmax)/2)
                     W = floor(Int64, W)
-                    @time for i in 1:k
+                    @time for i in 1:k #macro to benchmark
                         dir_path = string(n, base=10)
                         if !isdir(dir_path) #if dir doesnt exist yet
                             mkdir(dir_path)
-                        end
+                        end #end if
                         if Sys.iswindows() # portability
-                            name =  dir_path * "\\" * "file" * string(i,base=10)
+                            name =  dir_path * "\\" * "file" * string(i,base=10) # * is the concat operator
                         else
                             name = dir_path * "/" * "file" * string(i,base=10)
                         end
@@ -36,7 +36,7 @@ try
                         end #do io
                         rand_values = rand(vmin:vmax, n)
                         rand_weights = rand(wmin:wmax, n)
-                        open(complete_path, "a") do io
+                        open(complete_path, "a") do io # a for append
                             writedlm(io, [rand_values rand_weights], ' ')
                         end #io
                     end #for i

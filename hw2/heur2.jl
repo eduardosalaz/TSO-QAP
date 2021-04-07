@@ -15,7 +15,7 @@ function main()
     input_array = nothing
     M = hcat(values, weights)
     Φ = sortslices(M,dims=1,by=x->(-x[2],x[1]),rev=true)
-    # sort first by col2 then col1
+    # sort first by reverse of col2 then col1
     # this is done to tiebreak same weights
     M = nothing
     Φ = Φ[:]

@@ -2,7 +2,6 @@ using DelimitedFiles # readdlm
 
 function main()
     file_name = ARGS[1] # Julia is a 1-index based language
-    # file_name = "10\\KpInstance1.dat"
     try
         input_array = readdlm(file_name, ' ', Int, '\n') # reads a 2d array from file
     catch
@@ -21,7 +20,7 @@ function main()
     input_array = nothing # cleans up memory
     M = hcat(values, weights) # concatenates both Vectors on a 2D Array
     Φ = sortslices(M,dims=1,by=x->(x[1],-x[2]),rev=true)
-    # sort first by col1 then col2
+    # sort first by col1 then the reverse of col2 (thus the - sign)
     # this is done to tiebreak same values
     M = nothing
     Φ = Φ[:] # flattens the 2d array to a 1d
