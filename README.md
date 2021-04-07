@@ -17,7 +17,8 @@ Donde ARG1 es el path completo al archivo .dat que se genera en el primer progra
 
 ## Dependencias
 
-Para instalar las dependencias del proyecto hay que activar el entorno especificado por Project.toml
+Para instalar las dependencias del proyecto hay que activar el entorno especificado por Project.toml.
+
 Una recomendación es añadir un archivo ```startup.jl``` en ```~\.julia\config``` e incluir
 ```
 if isfile("Project.toml") && isfile("Manifest.toml")
