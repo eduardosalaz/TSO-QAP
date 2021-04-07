@@ -42,17 +42,7 @@ function generate(numLocations, instance)
     firstLine = string(numLocations, base=10) * "\n"
     open(name, "w") do io
         write(io, firstLine)
-    end
-    open(name, "a") do io
-        write(io, "*\n")
-    end
-    open(name, "a") do io
         writedlm(io, [distancias], ' ')
-    end
-    open(name, "a") do io
-        write(io, "*\n")
-    end
-    open(name, "a") do io
         writedlm(io, [flujos], ' ')
     end
     println()
