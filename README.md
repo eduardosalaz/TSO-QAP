@@ -1,6 +1,6 @@
 # TSO
 
-## Ejecución
+## Ejecución del PIA
 Probado en Julia 1.6.0
 
 Para ejecutar el PIA primero se debe de ejecutar el generador de instancias
