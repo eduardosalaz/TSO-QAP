@@ -51,13 +51,13 @@ function generate(numLocations, instance)
 end
 
 try
-    numLocations = parse(Int64, ARGS[1]) #ARGS es el arreglo de argumentos del programa
+    numLocations = parse(Int64, ARGS[1]) # ARGS es el arreglo de argumentos del programa
     numInstances = parse(Int64, ARGS[2])
-    dir_path = string(numLocations, base=10) #creamos el nombre del directorio en el que se guardaran las instancias
-    if !isdir(dir_path) #if dir doesnt exist yet
-        mkdir(dir_path)
+    dir_path = string(numLocations, base=10) # creamos el nombre del directorio en el que se guardaran las instancias
+    if !isdir(dir_path) # si el dir no existe
+        mkdir(dir_path) # hazlo
     end
-    cd(dir_path)
+    cd(dir_path) # cd al dir 
     for instance in 1:numInstances
         generate(numLocations, instance)
     end
