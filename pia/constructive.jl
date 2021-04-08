@@ -15,12 +15,12 @@ function heuristic(cost, X, iter, sum)
     value, index = findmin(cost) # análogo al paso 4
     x = index[1] # paso 4
     y = index[2] # paso 4
-    cost[:,y] .= 9999 # paso 5, no se eliminan como tal pero se dejan unfeasible
-    cost[x,:] .= 9999 # paso 5
+    cost[:,y] .= 9999999 # paso 5, no se eliminan como tal pero se dejan unfeasible
+    cost[x,:] .= 9999999 # paso 5
     X[x,y] = 1 # paso 6
     sum += value # paso 7
     printCost = sparse(cost) # todo esto es para imprimir la matriz de costos actualizada
-    replace!(printCost, 9999=>0)
+    replace!(printCost, 9999999=>0)
     dropzeros!(printCost)
     print("\nCheapest cost: ", value, " found at: ", x, ",", y)
     print("\nDecision matrix: ")
@@ -34,6 +34,7 @@ end
 
 try
     file = ARGS[1]
+    verbose = parse(Int, ARGS[2])
     stream = open(file, "r")
     contents = read(stream, String)
     numLocations, distString, flowString = split(contents, "\n") # cada salto de linea representa un valor nuevo
@@ -42,28 +43,38 @@ try
     distanceM = reshape(distances, (numLocations, numLocations)) # al arreglo le damos la forma de la matriz tomando en cuenta numLocations 
     flows = [parse(Int, flow) for flow in split(flowString)]
     flowM = reshape(flows, (numLocations, numLocations))
-    println("Number of Locations: " * string(numLocations, base=10))
-    print("\nDistance matrix: ")
-    show(stdout, "text/plain", distanceM)
-    println()
-    print("\nFlow matrix: ")
-    show(stdout, "text/plain", flowM)
-    println()
     × = * # mejor notación
     costM = distanceM × flowM # matriz de costos, paso 1
     iters = 0 # paso 1
+    if verbose == 1
+        println("Number of Locations: " * string(numLocations, base=10))
+        print("\nDistance matrix: ")
+        show(stdout, "text/plain", distanceM)
+        println()
+        print("\nFlow matrix: ")
+        show(stdout, "text/plain", flowM)
+        println()
+    end
     print("\nCost matrix: ")
     show(stdout, "text/plain", costM)
     println()
     X = zeros(Int8, numLocations, numLocations) # matriz de decisión, paso 2
     Σ = 0 # paso 2
     @time while iters < numLocations # paso 3
-        costM, X, iters, Σ = heuristic(costM, X, iters, Σ)
+        costM, X, iters,Σ = heuristic(costM, X, iters, Σ)
     end
     printstyled(stdout, "End of Heuristic\n", color=:green)
     println("Total cost: ", Σ)
     print("Decision matrix: ")
     show(stdout, "text/plain", X)
+    coordenadas = findall(x->x!=0, X)
+    localizaciones = Int[]
+    for coord in coordenadas
+        x = coord[1]
+        push!(localizaciones, x)
+    end
+    println("\nList of facilities: ", localizaciones)
+
 catch
-    @error "File is invalid"
+    @error "Invalid file or missing arguments"
 end

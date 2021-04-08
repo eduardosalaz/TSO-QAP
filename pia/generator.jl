@@ -1,4 +1,4 @@
-using Random, Distances, LinearAlgebra, DelimitedFiles, Gadfly, Cairo
+using Random, Distances, LinearAlgebra, DelimitedFiles
 
 """
     generate(numLocations)
@@ -35,10 +35,6 @@ function generate(numLocations, instance)
     # EN JULIA EL OPERADOR * ES PARA CONCATENAR STRINGS
     x = coords[:,1] # agarra todas las filas de la primera columna 
     y = coords[:,2] # agarra todas las filas de la segunda columna
-    p = plot(x=x,y=y, Geom.point, Theme(panel_fill=colorant"white", default_color=colorant"orange"));
-    push!(p, Guide.title("Locations"));
-    name_plot = name * ".pdf" # en png se cambian los colores no se muy bien porque
-    draw(PDF(name_plot, 5inch, 5inch), p) # se guarda el plot
     name = name * ".dat"
     firstLine = string(numLocations, base=10) * "\n"
     open(name, "w") do io
