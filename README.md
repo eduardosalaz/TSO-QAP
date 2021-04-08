@@ -1,6 +1,9 @@
 # TSO
 
 ## Ejecución del PIA
+
+Generador de Instancias del QAP, Heurística Constructiva y Heurística de Búsqueda Local
+
 Probado en [Julia](https://julialang.org/downloads/) 1.6.0
 
 Para ejecutar el PIA primero se debe de ejecutar el generador de instancias
