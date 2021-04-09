@@ -16,7 +16,7 @@ Para ejecutar la heurística constructiva se debe de ejecutar
 ```
 julia constructive.jl ARG1 ARG2
 ```
-Donde ARG1 es el path completo al archivo .dat que se genera en el primer programa y ARG2 el tipo de verbosidad que se quiere (1 para verboso, otro para silencioso)
+Donde ARG1 es el path completo al archivo .dat que se genera en el primer programa y ARG2 (opcional) especifica la verbosidad
 
 ## Dependencias
 
