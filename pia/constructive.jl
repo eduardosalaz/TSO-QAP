@@ -114,7 +114,6 @@ function saveToFile(Σ, X, locations, Δt, name)
     printstyled(stdout, "Wrote to file\n", color=:green)
 end
 
-
 function main()
     parsed_args = parse_commandline()
     directory = get(parsed_args, "dir", false)
@@ -159,7 +158,7 @@ function main()
                 saveToFile(Σ, X, locations, Δt, fullPath)
             end
         catch
-            println(stacktrace())
+            @error "Invalid file name"
         end
         
     end
