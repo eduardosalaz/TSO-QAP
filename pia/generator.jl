@@ -43,7 +43,6 @@ function generate(numLocations, instance)
         writedlm(io, [flow], ' ')
     end # escribimos al archivo nuestro numero de localizaciones, matrices de distancia y flujo
     println()
-    printstyled(stdout, "Files written\n", color=:green)
 end
 
 try
@@ -57,6 +56,7 @@ try
     for instance in 1:numInstances
         generate(numLocations, instance)
     end
+    printstyled(stdout, "Files written\n", color=:green)
 catch
     @error "Invalid input"
 end
