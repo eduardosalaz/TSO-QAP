@@ -14,10 +14,21 @@ Donde ARG1 es el número de localizaciones y ARG2 el número de instancias a cre
 
 Para ejecutar la heurística constructiva se debe de ejecutar
 ```
-julia constructive.jl ARG1 ARG2
+julia constructive.jl
 ```
-Donde ARG1 es el path completo al archivo .dat que se genera en el primer programa y ARG2 (opcional) especifica la verbosidad
+usando la bandera de ```--help```:
+```
+usage: constructive.jl [-d] [-v] [-s] [-h] path
 
+positional arguments:
+  path           Path to file or directory
+
+optional arguments:
+  -d, --dir      Specify if a directory is to be read
+  -v, --verbose  Specify verbose output
+  -s, --save     Save solutions to files
+  -h, --help     show this help message and exit
+```
 ## Dependencias
 
 Para instalar las dependencias del proyecto hay que activar el entorno especificado por Project.toml.
@@ -34,5 +45,5 @@ De otra forma, hay que entrar al modo de Pkg en el REPL de julia presionando ]
 ```
 julia
 julia> ]
-(@v1.6) pkg> add Distances, Cairo, Gadfly
+(@v1.6) pkg> add Distances, ArgParse
 ```
