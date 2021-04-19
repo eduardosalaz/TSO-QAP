@@ -120,7 +120,13 @@ function main()
     verbose = get(parsed_args, "verbose", false)
     save = get(parsed_args, "save", false)
     mainPath = get(parsed_args, "path", "")
-    splittedPath= split(mainPath, '\\')
+
+    if Sys.isunix()
+        splittedPath= split(mainPath, '/')
+    else
+        splittedPath= split(mainPath, '\\')
+    end
+    
     number = splittedPath[2]
     
     if !directory
@@ -142,7 +148,11 @@ function main()
                 Σ, X, locations, Δt =  parseFile(path, verbose)
                 if save
                     slicedPath = replace(path, ".dat" => "")
-                    fullPath = "..\\" *pathSols * "\\" * slicedPath * "_sol"  * ".dat"
+                    if Sys.isunix()
+                        fullPath = "../" *pathSols * "/" * slicedPath * "_sol"  * ".dat"
+                    else
+                        fullPath = "..\\" *pathSols * "\\" * slicedPath * "_sol"  * ".dat"
+                    end
                     saveToFile(Σ, X, locations, Δt, fullPath)
                 end
             end
@@ -154,7 +164,11 @@ function main()
             Σ, X, locations,  Δt = parseFile(mainPath, verbose)
             if save
                 slicedPath = replace(fileName, ".dat" => "")
-                fullPath = pathSols *  "\\" * slicedPath * "_sol"  * ".dat"
+                if Sys.isunix()
+                    fullPath = pathSols *  "\\" * slicedPath * "_sol"  * ".dat"
+                else
+                    fullPath = pathSols *  "/" * slicedPath * "_sol"  * ".dat"
+                end
                 saveToFile(Σ, X, locations, Δt, fullPath)
             end
         catch
