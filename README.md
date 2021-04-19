@@ -8,10 +8,21 @@ Probado en [Julia](https://julialang.org/downloads/) 1.6.0
 
 Para ejecutar el PIA primero se debe de ejecutar el generador de instancias
 ```
-julia generator.jl ARG1 ARG2
+julia generator.jl
 ```
-Donde ARG1 es el número de localizaciones y ARG2 el número de instancias a crear
+usando la bandera de ```--help```:
+```
+usage: generator.jl [-v] [-h] nLocations nInstances
 
+positional arguments:
+  nLocations     Number of locations of the instance (type: Int64,
+                 default: 0)
+  nInstances     Number of instances (type: Int64, default: 0)
+
+optional arguments:
+  -v, --verbose  Specify verbose output
+  -h, --help     show this help message and exit
+```
 Para ejecutar la heurística constructiva se debe de ejecutar
 ```
 julia constructive.jl
