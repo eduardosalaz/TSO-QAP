@@ -1,5 +1,18 @@
 using SparseArrays, DelimitedFiles, ArgParse, Dates
 
+function equalsBigNumber(matriz)
+    equals = true
+    for elem in matriz
+        if elem != 99999999
+            equals = false
+            break
+        end
+    end
+    return equals
+end
+
+
+
 # pseudocódigo del algoritmo
 # 1.- Input: matriz de costos, número de iteración
 # 2.- Output: matriz de decisión, Σ
@@ -12,23 +25,26 @@ using SparseArrays, DelimitedFiles, ArgParse, Dates
 # 9.- Return matriz de decisión, Σ
 
 function heuristic(cost, X, iter, sum, verbose)
-    value, index = findmin(cost) # análogo al paso 4
-    x = index[1] # paso 4
-    y = index[2] # paso 4
-    cost[:,y] .= 9999999 # paso 5, no se eliminan como tal pero se dejan unfeasible
-    cost[x,:] .= 9999999 # paso 5
-    X[x,y] = 1 # paso 6
-    sum += value # paso 7
-    if verbose
-        printCost = sparse(cost) # todo esto es para imprimir la matriz de costos actualizada
-        replace!(printCost, 9999999=>0)
-        dropzeros!(printCost)
-        print("\nCheapest cost: ", value, " found at: ", x, ",", y)
-        print("\nDecision matrix: ")
-        show(stdout, "text/plain", X)
-        println("\nUpdated cost matrix: ")
-        show(stdout, "text/plain", printCost)
-        println()
+    replace!(cost, 0=>Inf)
+    if !equalsBigNumber(cost)
+        value, index = findmin(cost) # análogo al paso 4
+        x = index[1] # paso 4
+        y = index[2] # paso 4
+        cost[:,y] .= Inf # paso 5, no se eliminan como tal pero se dejan unfeasible
+        cost[x,:] .= Inf # paso 5
+        X[x,y] = 1 # paso 6
+        sum += value # paso 7
+        if verbose
+            printCost = sparse(cost) # todo esto es para imprimir la matriz de costos actualizada
+            replace!(printCost, Inf=>0)
+            dropzeros!(printCost)
+            print("\nCheapest cost: ", value, " found at: ", x, ",", y)
+            print("\nDecision matrix: ")
+            show(stdout, "text/plain", X)
+            println("\nUpdated cost matrix: ")
+            show(stdout, "text/plain", printCost)
+            println()
+        end
     end
     iter += 1 # paso 8
     return cost,X,iter,sum # paso 9
@@ -45,6 +61,8 @@ function parseFile(path, verbose)
     flowM = reshape(flows, (numLocations, numLocations))
     × = * # mejor notación
     costM = distanceM × flowM # matriz de costos, paso 1
+    costM = convert(Array{Float32}, costM)
+    costMWrite = copy(costM)
     iters = 0 # paso 1
 
     if verbose
@@ -80,7 +98,7 @@ function parseFile(path, verbose)
         push!(locations, x)
     end
     println("\nList of facilities: ", locations)
-    return Σ, X, locations, Δt
+    return Σ, X, locations, Δt, costMWrite
 end
 
 function parse_commandline()
@@ -98,17 +116,18 @@ function parse_commandline()
     "--save", "-s"
         help = "Save solutions to files"
         action = :store_true
-    
     end 
     return parse_args(settings)
 end
 
-function saveToFile(Σ, X, locations, Δt, name)
-    firstline = "Cost: " * string(Σ, base=10) * "\n"
+function saveToFile(Σ, X, locations, Δt, costM,name)
+    Σ = trunc(Int, Σ)
+    firstline = string(Σ, base=10) * "\n"
     open(name, "w") do io
         write(io, firstline)
         writedlm(io, [locations], ' ')
         writedlm(io, [X], ' ')
+        writedlm(io, [costM], ' ')
         write(io, string(Δt))
     end
     printstyled(stdout, "Wrote to file\n", color=:green)
@@ -145,7 +164,7 @@ function main()
             paths = readdir(mainPath)
             cd(mainPath)
             for path in paths
-                Σ, X, locations, Δt =  parseFile(path, verbose)
+                Σ, X, locations, Δt, costM =  parseFile(path, verbose)
                 if save
                     slicedPath = replace(path, ".dat" => "")
                     if Sys.isunix()
@@ -153,15 +172,15 @@ function main()
                     else
                         fullPath = "..\\" *pathSols * "\\" * slicedPath * "_sol"  * ".dat"
                     end
-                    saveToFile(Σ, X, locations, Δt, fullPath)
+                    saveToFile(Σ, X, locations, Δt, costM, fullPath)
                 end
             end
         catch
             @error "Invalid path for directory"
         end
     else
-        try
-            Σ, X, locations,  Δt = parseFile(mainPath, verbose)
+        #try
+            Σ, X, locations, Δt, costM = parseFile(mainPath, verbose)
             if save
                 slicedPath = replace(fileName, ".dat" => "")
                 if Sys.isunix()
@@ -169,11 +188,11 @@ function main()
                 else
                     fullPath = pathSols *  "/" * slicedPath * "_sol"  * ".dat"
                 end
-                saveToFile(Σ, X, locations, Δt, fullPath)
+                saveToFile(Σ, X, locations, Δt, costM, fullPath)
             end
-        catch
-            @error "Invalid file name"
-        end
+        #catch
+        #    @error "Invalid file name"
+        #end
         
     end
 end
