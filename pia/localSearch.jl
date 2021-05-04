@@ -100,7 +100,7 @@ function parse_commandline()
     settings = ArgParseSettings()
     @add_arg_table! settings begin
     "path"
-        help = "Path to file or directory"
+        help = "Path to file or directory OF SOLUTIONS"
         required = true
     "--dir", "-d"
         help = "Specify if a directory is to be read"
