@@ -3,15 +3,13 @@ using SparseArrays, DelimitedFiles, ArgParse, Dates
 function equalsBigNumber(matriz)
     equals = true
     for elem in matriz
-        if elem != 99999999
+        if elem != Inf
             equals = false
             break
         end
     end
     return equals
 end
-
-
 
 # pseudocódigo del algoritmo
 # 1.- Input: matriz de costos, número de iteración
@@ -45,8 +43,9 @@ function heuristic(cost, X, iter, sum, verbose)
             show(stdout, "text/plain", printCost)
             println()
         end
+        iter += 1
     end
-    iter += 1 # paso 8
+     # paso 8
     return cost,X,iter,sum # paso 9
 end
 
@@ -179,7 +178,7 @@ function main()
             @error "Invalid path for directory"
         end
     else
-        #try
+        try
             Σ, X, locations, Δt, costM = parseFile(mainPath, verbose)
             if save
                 slicedPath = replace(fileName, ".dat" => "")
@@ -190,9 +189,9 @@ function main()
                 end
                 saveToFile(Σ, X, locations, Δt, costM, fullPath)
             end
-        #catch
-        #    @error "Invalid file name"
-        #end
+        catch
+            @error "Invalid file name"
+        end
         
     end
 end
