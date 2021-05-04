@@ -1,20 +1,5 @@
 using ArgParse, DelimitedFiles, Dates
 
-
-"""
-for permutacionPerrona in permutaciones
-    for i in 1:length(permutacionPerrona)
-        numero = permutacionPerrona[i]
-        x = i
-        y = numero
-        X[x,y] = 1
-    end
-    valor = costo * X
-    if valor < value
-        value = valor
-    end
-end"""
-
 function decisionMatrix(locations)
     X = zeros(Int8, (length(locations), length(locations)))
     for i in 1:length(locations)
@@ -25,7 +10,6 @@ function decisionMatrix(locations)
     end
     return X
 end
-
 
 function heuristic(costM, Σ₀, locations₀, X₀, verbose)
     bestLocations = []
@@ -76,7 +60,6 @@ function heuristic(costM, Σ₀, locations₀, X₀, verbose)
     end
 end
 
-
 function parseFile(path, verbose)
     stream = open(path, "r")
     contents = read(stream, String) 
@@ -93,16 +76,11 @@ function parseFile(path, verbose)
     Δt₀ = Millisecond(Δt)
     start = now(UTC)
     Σ₁, locations₁, X₁ = heuristic(costM, Σ₀, locations₀, X₀, verbose)
-    println(Σ₁)
-    println(valorInicial)
     finish = now(UTC)
     Δt₁ = finish - start
     improvement = valorInicial - Σ₁
-    println(improvement)
     return Σ₁, locations₁, X₁, Δt₁, improvement
 end
-
-
 
 function saveToFile(Σ, locations, X, Δt, improvement,name)
     Σ = trunc(Int, Σ)
@@ -114,13 +92,9 @@ function saveToFile(Σ, locations, X, Δt, improvement,name)
         writedlm(io, [X], ' ')
         write(io, improv)
         write(io, string(Δt))
-
     end
     printstyled(stdout, "Wrote to file\n", color=:green)
 end
-
-
-
 
 function parse_commandline()
     settings = ArgParseSettings()
@@ -140,7 +114,6 @@ function parse_commandline()
     end 
     return parse_args(settings)
 end
-
 
 function main()
     parsed_args = parse_commandline()
