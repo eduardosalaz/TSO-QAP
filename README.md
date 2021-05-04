@@ -40,6 +40,23 @@ optional arguments:
   -s, --save     Save solutions to files
   -h, --help     show this help message and exit
 ```
+Para ejecutar la heurística de búsqueda local se debe de ejecutar
+```
+julia localSearch.jl
+```
+usando la bandera de ```--help```:
+```
+usage: localSearch.jl [-d] [-v] [-s] [-h] path
+
+positional arguments:
+  path           Path to file or directory OF SOLUTIONS
+
+optional arguments:
+  -d, --dir      Specify if a directory is to be read
+  -v, --verbose  Specify verbose output
+  -s, --save     Save solutions to files
+  -h, --help     show this help message and exit
+```
 ## Dependencias
 
 Para instalar las dependencias del proyecto hay que activar el entorno especificado por Project.toml.
