@@ -1,3 +1,3 @@
 include("helperGenerator.jl")
 
-principal()
+mainGenerator()

@@ -67,7 +67,7 @@ function parse_commandline()
     return parse_args(settings)
 end
 
-function principal()
+function mainGenerator()
     parsed_args = parse_commandline()
     numLocations = get(parsed_args, "nLocations", 0)
     numInstances = get(parsed_args, "nInstances", 0)

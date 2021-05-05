@@ -12,7 +12,7 @@ function parse_commandlinePia()
         required = true
         arg_type = Int
     "instanceSize"
-        help = "Size of instances of batch"
+        help = "Size of instances of batch: S, M or L"
         required = true
         arg_type = String
     end 
