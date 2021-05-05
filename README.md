@@ -6,7 +6,26 @@ Generador de Instancias del QAP, Heurística Constructiva y Heurística de Búsq
 
 Probado en [Julia](https://julialang.org/downloads/) 1.6.0
 
-Para ejecutar el PIA primero se debe de ejecutar el generador de instancias
+### PIA en un solo archivo:
+Para ejecutar el PIA en un sólo archivo (para el análisis y experimentación) se ejecuta
+```
+julia pia.jl
+```
+usando la bandera de ```--help```:
+```
+usage: pia.jl [-h] batchSize instanceSize
+
+positional arguments:
+  batchSize     Number of instances in batch (type: Int64)
+  instanceSize  Size of instances of batch: S, M or L
+
+optional arguments:
+  -h, --help    show this help message and exit
+```
+
+### PIA en archivos separados
+
+Para ejecutar el PIA de manera secuencial, primero se debe de ejecutar el generador de instancias
 ```
 julia generator.jl
 ```
@@ -23,7 +42,7 @@ optional arguments:
   -v, --verbose  Specify verbose output
   -h, --help     show this help message and exit
 ```
-Para ejecutar la heurística constructiva se debe de ejecutar
+Posteriormente, para ejecutar la heurística constructiva se debe de ejecutar
 ```
 julia constructive.jl
 ```
@@ -40,7 +59,7 @@ optional arguments:
   -s, --save     Save solutions to files
   -h, --help     show this help message and exit
 ```
-Para ejecutar la heurística de búsqueda local se debe de ejecutar
+Por último, para ejecutar la heurística de búsqueda local se debe de ejecutar
 ```
 julia localSearch.jl
 ```
