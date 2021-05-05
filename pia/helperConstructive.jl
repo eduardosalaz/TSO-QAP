@@ -72,10 +72,11 @@ function parseFile(path, verbose, x)
         print("\nFlow matrix: ")
         show(stdout, "text/plain", flowM)
         println()
-    end
-    print("\nCost matrix: ")
+        print("\nCost matrix: ")
     show(stdout, "text/plain", costM)
     println()
+    end
+    
 
     X = zeros(Int8, numLocations, numLocations) # matriz de decisión, paso 2
     Σ = 0 # paso 2
@@ -85,18 +86,23 @@ function parseFile(path, verbose, x)
     end
     finish = now(UTC)
     Δt = finish-start
-    println(Δt)
-    printstyled(stdout, "End of Heuristic\n", color=:green)
-    println("Total cost: ", Σ)
-    print("Decision matrix: ")
-    show(stdout, "text/plain", X)
+    if verbose
+        println(Δt)
+        printstyled(stdout, "End of Heuristic\n", color=:green)
+        println("Total cost: ", Σ)
+        print("Decision matrix: ")
+        show(stdout, "text/plain", X)
+    end
     coordenadas = findall(x->x!=0, X)
     locations = Int[]
     for coord in coordenadas
         x = coord[1]
         push!(locations, x)
     end
-    println("\nList of facilities: ", locations)
+    if verbose
+        println("\nList of facilities: ", locations)
+    end
+    println(Σ, locations)
     return Σ, X, locations, Δt, costMWrite
 end
 
@@ -152,7 +158,7 @@ function mainConstructive()
     end
 
     if save
-        pathSols = number * "solutions"
+        pathSols = number * "_con"
         if !isdir(pathSols)
             mkdir(pathSols)
         end  
@@ -167,9 +173,9 @@ function mainConstructive()
                 if save
                     slicedPath = replace(path, ".dat" => "")
                     if Sys.isunix()
-                        fullPath = "../" * pathSols * "/" * slicedPath * "_sol"  * ".dat"
+                        fullPath = "../" * pathSols * "/" * slicedPath * "_con"  * ".dat"
                     else
-                        fullPath = "..\\" * pathSols * "\\" * slicedPath * "_sol"  * ".dat"
+                        fullPath = "..\\" * pathSols * "\\" * slicedPath * "_con"  * ".dat"
                     end
                     saveToFileConstructive(Σ, X, locations, Δt, costM, fullPath)
                 end
@@ -183,9 +189,9 @@ function mainConstructive()
             if save
                 slicedPath = replace(fileName, ".dat" => "")
                 if Sys.isunix()
-                    fullPath = pathSols *  "\\" * slicedPath * "_sol"  * ".dat"
+                    fullPath = pathSols *  "\\" * slicedPath * "_con"  * ".dat"
                 else
-                    fullPath = pathSols *  "/" * slicedPath * "_sol"  * ".dat"
+                    fullPath = pathSols *  "/" * slicedPath * "_con"  * ".dat"
                 end
                 saveToFileConstructive(Σ, X, locations, Δt, costM, fullPath)
             end

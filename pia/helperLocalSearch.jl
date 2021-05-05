@@ -53,7 +53,6 @@ function localSearch(costM, Σ₀, locations₀, X₀, verbose)
         end
         localSearch(costM, bestValue, bestLocation, X, verbose)
     else
-        println("No further improvement made")
         println("Final result: ")
         println(Σ₀, locations₀)
         return Σ₀, locations₀, X₀
@@ -137,7 +136,7 @@ function mainLocalSearch()
     end
 
     if save
-        pathSols2opt = numero * "_2opt"
+        pathSols2opt = numero * "_ls"
         if !isdir(pathSols2opt)
             mkdir(pathSols2opt)
         end
@@ -151,10 +150,11 @@ function mainLocalSearch()
                 Σ₁, locations₁, X₁, Δt₁, improvement = parseFile(path, verbose)
                 if save
                     slicedPath = replace(path, ".dat" => "")
+                    slicedPath = replace(slicedPath, "con" => "ls")
                     if Sys.isunix()
-                        fullPath = "../" * pathSols2opt * "/" * slicedPath * "_2opt"  * ".dat"
+                        fullPath = "../" * pathSols2opt * "/" * slicedPath * ".dat"
                     else
-                        fullPath = "..\\" * pathSols2opt * "\\" * slicedPath * "_2opt"  * ".dat"
+                        fullPath = "..\\" * pathSols2opt * "\\" * slicedPath * ".dat"
                     end
                     saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
                 end
@@ -167,10 +167,11 @@ function mainLocalSearch()
         Σ₁, locations₁, X₁, Δt₁, improvement = parseFile(mainPath, verbose)
             if save
                 slicedPath = replace(fileName, ".dat" => "")
+                slicedPath = replace(slicedPath, "con" => "ls")
                 if Sys.isunix()
-                    fullPath = pathSols2opt *  "\\" * slicedPath * "_sol"  * ".dat"
+                    fullPath = pathSols2opt *  "\\" * slicedPath * ".dat"
                 else
-                    fullPath = pathSols2opt *  "/" * slicedPath * "_2opt"  * ".dat"
+                    fullPath = pathSols2opt *  "/" * slicedPath * ".dat"
                 end
                 saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
             end
