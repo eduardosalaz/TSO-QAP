@@ -37,15 +37,49 @@ function mainPia()
     if !isdir(instanceSize)
         mkdir(instanceSize)
     end
+    pathSols = instanceSize * "_sols"
+    if !isdir(pathSols)
+        mkdir(pathSols)
+    end
+
+    path2opt = instanceSize * "_2opt"
+    if !isdir(path2opt)
+        mkdir(path2opt)
+    end
+    
     cd(instanceSize)
     for instance in 1:batchSize
         generate(N, instance, false)
     end
     printstyled(stdout, "Files written\n", color=:green)
     paths = readdir(pwd())
-    println(paths)
-
-
+    for path in paths
+        Σ, X, locations, Δt, costM =  parseFile(path, false, 1)
+        slicedPath = replace(path, ".dat" => "")
+        if Sys.isunix()
+            fullPath = "../" * pathSols * "/" * slicedPath * "_sol"  * ".dat"
+        else
+            fullPath = "..\\" * pathSols * "\\" * slicedPath * "_sol"  * ".dat"
+        end
+        saveToFileConstructive(Σ, X, locations, Δt, costM, fullPath)
+    end
+    if Sys.isunix()
+        cd("../")
+    else
+        cd("..\\")
+    end
+    cd(pathSols)
+    paths = readdir(pwd())
+    for path in paths
+        Σ₁, locations₁, X₁, Δt₁, improvement = parseFile(path, false)
+        slicedPath = replace(path, ".dat" => "")
+        if Sys.isunix()
+            fullPath = "../" * path2opt * "/" * slicedPath * "_2opt"  * ".dat"
+        else
+            fullPath = "..\\" * path2opt * "\\" * slicedPath * "_2opt"  * ".dat"
+        end
+        saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
+    end
 
 end
 

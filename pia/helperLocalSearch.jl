@@ -11,7 +11,7 @@ function decisionMatrix(locations)
     return X
 end
 
-function heuristic(costM, Σ₀, locations₀, X₀, verbose)
+function localSearch(costM, Σ₀, locations₀, X₀, verbose)
     bestLocations = []
     bestValues = []
     improvement = false
@@ -51,7 +51,7 @@ function heuristic(costM, Σ₀, locations₀, X₀, verbose)
         if verbose
             println(bestValue, bestLocation)
         end
-        heuristic(costM, bestValue, bestLocation, X, verbose)
+        localSearch(costM, bestValue, bestLocation, X, verbose)
     else
         println("No further improvement made")
         println("Final result: ")
@@ -75,14 +75,14 @@ function parseFile(path, verbose)
     Δt = split(Δt)[1]
     Δt₀ = Millisecond(Δt)
     start = now(UTC)
-    Σ₁, locations₁, X₁ = heuristic(costM, Σ₀, locations₀, X₀, verbose)
+    Σ₁, locations₁, X₁ = localSearch(costM, Σ₀, locations₀, X₀, verbose)
     finish = now(UTC)
     Δt₁ = finish - start
     improvement = valorInicial - Σ₁
     return Σ₁, locations₁, X₁, Δt₁, improvement
 end
 
-function saveToFile(Σ, locations, X, Δt, improvement,name)
+function saveToFileLocalSearch(Σ, locations, X, Δt, improvement,name)
     Σ = trunc(Int, Σ)
     firstline = string(Σ, base=10) * "\n"
     improv = "Improvement: " * string(improvement, base=10) * "\n"
@@ -116,7 +116,6 @@ function parse_commandline()
 end
 
 function mainLocalSearch()
-    println("local")
     parsed_args = parse_commandline()
     directory = get(parsed_args, "dir", false)
     verbose = get(parsed_args, "verbose", false)
@@ -157,7 +156,7 @@ function mainLocalSearch()
                     else
                         fullPath = "..\\" * pathSols2opt * "\\" * slicedPath * "_2opt"  * ".dat"
                     end
-                    saveToFile(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
+                    saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
                 end
             end
         catch
@@ -173,7 +172,7 @@ function mainLocalSearch()
                 else
                     fullPath = pathSols2opt *  "/" * slicedPath * "_2opt"  * ".dat"
                 end
-                saveToFile(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
+                saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
             end
         catch
             @error "Invalid file name"

@@ -22,7 +22,7 @@ end
 #   8.- número de iteración += 1
 # 9.- Return matriz de decisión, Σ
 
-function heuristic(cost, X, iter, sum, verbose)
+function constructive(cost, X, iter, sum, verbose)
     replace!(cost, 0=>Inf)
     if !equalsBigNumber(cost)
         value, index = findmin(cost) # análogo al paso 4
@@ -49,7 +49,7 @@ function heuristic(cost, X, iter, sum, verbose)
     return cost,X,iter,sum # paso 9
 end
 
-function parseFile(path, verbose)
+function parseFile(path, verbose, x)
     stream = open(path, "r")
     contents = read(stream, String)
     numLocations, distString, flowString = split(contents, "\n") # cada salto de linea representa un valor nuevo
@@ -81,7 +81,7 @@ function parseFile(path, verbose)
     Σ = 0 # paso 2
     start = now(UTC)
     while iters < numLocations # paso 3
-        costM, X, iters,Σ = heuristic(costM, X, iters, Σ, verbose)
+        costM, X, iters,Σ = constructive(costM, X, iters, Σ, verbose)
     end
     finish = now(UTC)
     Δt = finish-start
@@ -119,7 +119,7 @@ function parse_commandline()
     return parse_args(settings)
 end
 
-function saveToFile(Σ, X, locations, Δt, costM,name)
+function saveToFileConstructive(Σ, X, locations, Δt, costM,name)
     Σ = trunc(Int, Σ)
     firstline = string(Σ, base=10) * "\n"
     open(name, "w") do io
@@ -163,15 +163,15 @@ function mainConstructive()
             paths = readdir(mainPath)
             cd(mainPath)
             for path in paths
-                Σ, X, locations, Δt, costM =  parseFile(path, verbose)
+                Σ, X, locations, Δt, costM =  parseFile(path, verbose, 1)
                 if save
                     slicedPath = replace(path, ".dat" => "")
                     if Sys.isunix()
-                        fullPath = "../" *pathSols * "/" * slicedPath * "_sol"  * ".dat"
+                        fullPath = "../" * pathSols * "/" * slicedPath * "_sol"  * ".dat"
                     else
-                        fullPath = "..\\" *pathSols * "\\" * slicedPath * "_sol"  * ".dat"
+                        fullPath = "..\\" * pathSols * "\\" * slicedPath * "_sol"  * ".dat"
                     end
-                    saveToFile(Σ, X, locations, Δt, costM, fullPath)
+                    saveToFileConstructive(Σ, X, locations, Δt, costM, fullPath)
                 end
             end
         catch
@@ -179,7 +179,7 @@ function mainConstructive()
         end
     else
         try
-            Σ, X, locations, Δt, costM = parseFile(mainPath, verbose)
+            Σ, X, locations, Δt, costM = parseFile(mainPath, verbose, 1)
             if save
                 slicedPath = replace(fileName, ".dat" => "")
                 if Sys.isunix()
@@ -187,7 +187,7 @@ function mainConstructive()
                 else
                     fullPath = pathSols *  "/" * slicedPath * "_sol"  * ".dat"
                 end
-                saveToFile(Σ, X, locations, Δt, costM, fullPath)
+                saveToFileConstructive(Σ, X, locations, Δt, costM, fullPath)
             end
         catch
             @error "Invalid file name"
