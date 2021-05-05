@@ -7,7 +7,7 @@ Generador de Instancias del QAP, Heurística Constructiva y Heurística de Búsq
 Probado en [Julia](https://julialang.org/downloads/) 1.6.0
 
 ### PIA en un solo archivo:
-Para ejecutar el PIA en un sólo archivo (para el análisis y experimentación= se ejecuta
+Para ejecutar el PIA en un sólo archivo (para el análisis y experimentación) se ejecuta
 ```
 julia pia.jl
 ```
