@@ -1,4 +1,4 @@
-using ArgParse, DataFrames, StatsPlots
+using ArgParse, DataFrames, StatsPlots, CSV
 gr() # para inicializar el backend de los plots
 
 include("helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
@@ -20,7 +20,7 @@ function parse_commandlinePia() # lee los argumentos del programa y los procesa
     return parse_args(settings)
 end
 
-function mkDir(path)
+function mkDir(path::String)
     if !isdir(path)
         mkdir(path)
     end
@@ -107,7 +107,7 @@ function mainPia()
         cd("..\\")
     end
 
-    plotsPath = instanceSize * "_plots"
+    plotsPath = instanceSize * "_output"
 
     mkDir(plotsPath)
     cd(plotsPath)
@@ -118,12 +118,31 @@ function mainPia()
     df = innerjoin(df1, df2, on =:FileNumber)
     sort!(df, [:FileNumber])
     df = df[!, [:FileNumber, :ValueC, :ΔtC, :ValueLS, :ΔtLS, :AbsImprovement]]
+    relative = (df[!, 6] ./ df[!, 2]) .* 100
+    df[!, :RelImprovement] = relative
     println(df)
     titleString = "Comparison of absolute values of batch size " *  instanceSize
-    @df df plot(:FileNumber, [:ValueC, :ValueLS], line = (:solid, 3), title = titleString, legend = :top,
+    @df df plot(:FileNumber, [:ValueC, :ValueLS], line = (:solid, 3), title = titleString, legend = :best,
                 xlabel = "Number of instance", ylabel = "Objective function value", labels = ["Constructive" "Local"], 
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
     pathAbsolute = "absoluteValues" * instanceSize * ".pdf"
     savefig(pathAbsolute)
+
+    titleString = "Relative value improvement of batch size " *  instanceSize
+    @df df plot(:FileNumber, [:RelImprovement], line = (:solid, 3), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Percentage of improvement", label = "Improvement",
+                size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
+    pathRelative = "relativeValues" * instanceSize * ".pdf"
+    savefig(pathRelative)
+
+    titleString = "Comparison of run time of batch size " *  instanceSize
+    @df df plot(:FileNumber, [:ΔtC, :ΔtLS], line = (:solid, 3), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Hundreds of Microseconds", labels = ["Constructive" "Local"], 
+                size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
+    pathTime = "times" * instanceSize * ".pdf"
+    savefig(pathTime)
+
+    CSV.write("results.csv", df)
+
 end
 mainPia()
