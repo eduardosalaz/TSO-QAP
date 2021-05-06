@@ -1,7 +1,7 @@
 using ArgParse, DelimitedFiles, Dates
 
-function decisionMatrix(locations)
-    X = zeros(Int8, (length(locations), length(locations)))
+function decisionMatrix(locations::Vector{Int64})::Matrix{Int64}
+    X = zeros(Int64, (length(locations), length(locations)))
     for i in 1:length(locations)
         numero = locations[i]
         x = i
@@ -11,7 +11,7 @@ function decisionMatrix(locations)
     return X
 end
 
-function localSearch(costM, Σ₀, locations₀, X₀, verbose)
+function localSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64}, X₀::Matrix{Int64}, verbose::Bool, full::Bool)
     bestLocations = []
     bestValues = []
     improvement = false
@@ -51,38 +51,39 @@ function localSearch(costM, Σ₀, locations₀, X₀, verbose)
         if verbose
             println(bestValue, bestLocation)
         end
-        localSearch(costM, bestValue, bestLocation, X, verbose)
+        localSearch(costM, bestValue, bestLocation, X, verbose, true)
     else
-        println("Final result: ")
-        println(Σ₀, locations₀)
+        if full
+            println("Final result: ")
+            println(Σ₀, locations₀)
+        end
         return Σ₀, locations₀, X₀
     end
 end
 
-function parseFile(path, verbose)
+function parseFile(path::String, verbose::Bool)
     stream = open(path, "r")
     contents = read(stream, String) 
-    Σ, locations, X, costM, Δt = split(contents, "\n")
+    Σ, locations, X, costMStr, Δt = split(contents, "\n")
     Σ₀ = parse(Int, Σ)
     valorInicial = copy(Σ₀)
     locations₀ = [parse(Int, location) for location in split(locations)]
-    X = [parse(Int, x) for x in split(X)]
-    X = reshape(X, (length(locations₀), length(locations₀)))
-    X₀ = X
-    costM = [trunc(Int, parse(Float32,cost)) for cost in split(costM)]
+    Xmatrix = [parse(Int, x) for x in split(X)]
+    Xmatrix = reshape(Xmatrix, (length(locations₀), length(locations₀)))
+    X₀ = Xmatrix
+    costM = [trunc(Int, parse(Float32,cost)) for cost in split(costMStr)]
     costM = reshape(costM, (length(locations₀), length(locations₀)))
-    Δt = split(Δt)[1]
-    Δt₀ = Millisecond(Δt)
-    start = now(UTC)
-    Σ₁, locations₁, X₁ = localSearch(costM, Σ₀, locations₀, X₀, verbose)
-    finish = now(UTC)
-    Δt₁ = finish - start
+    start = time_ns()
+    Σ₁, locations₁, X₁ = localSearch(costM, Σ₀, locations₀, X₀, verbose, true)
+    finish = time_ns()
+    Δt₁ = (finish - start) * 1e-5 # micro segundos
     improvement = valorInicial - Σ₁
     return Σ₁, locations₁, X₁, Δt₁, improvement
 end
 
 function saveToFileLocalSearch(Σ, locations, X, Δt, improvement,name)
     Σ = trunc(Int, Σ)
+    time = string(Δt) * " hundrends of microseconds"
     firstline = string(Σ, base=10) * "\n"
     improv = "Improvement: " * string(improvement, base=10) * "\n"
     open(name, "w") do io
@@ -90,7 +91,7 @@ function saveToFileLocalSearch(Σ, locations, X, Δt, improvement,name)
         writedlm(io, [locations], ' ')
         writedlm(io, [X], ' ')
         write(io, improv)
-        write(io, string(Δt))
+        write(io, time)
     end
     printstyled(stdout, "Wrote to file\n", color=:green)
 end

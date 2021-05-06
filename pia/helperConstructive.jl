@@ -22,7 +22,7 @@ end
 #   8.- número de iteración += 1
 # 9.- Return matriz de decisión, Σ
 
-function constructive(cost, X, iter, sum, verbose)
+function constructive(cost, X, iter, sum, verbose::Bool)
     replace!(cost, 0=>Inf)
     if !equalsBigNumber(cost)
         value, index = findmin(cost) # análogo al paso 4
@@ -80,12 +80,12 @@ function parseFile(path, verbose, x)
 
     X = zeros(Int8, numLocations, numLocations) # matriz de decisión, paso 2
     Σ = 0 # paso 2
-    start = now(UTC)
+    start = time_ns()
     while iters < numLocations # paso 3
         costM, X, iters,Σ = constructive(costM, X, iters, Σ, verbose)
     end
-    finish = now(UTC)
-    Δt = finish-start
+    finish = time_ns()
+    Δt = (finish - start) * 1e-5 # microsegundos
     if verbose
         println(Δt)
         printstyled(stdout, "End of Heuristic\n", color=:green)
@@ -126,6 +126,7 @@ function parse_commandline()
 end
 
 function saveToFileConstructive(Σ, X, locations, Δt, costM,name)
+    time = string(Δt) * " hundreds of microseconds"
     Σ = trunc(Int, Σ)
     firstline = string(Σ, base=10) * "\n"
     open(name, "w") do io
@@ -133,7 +134,7 @@ function saveToFileConstructive(Σ, X, locations, Δt, costM,name)
         writedlm(io, [locations], ' ')
         writedlm(io, [X], ' ')
         writedlm(io, [costM], ' ')
-        write(io, string(Δt))
+        write(io, time)
     end
     printstyled(stdout, "Wrote to file\n", color=:green)
 end
