@@ -92,5 +92,5 @@ De otra forma, hay que entrar al modo de Pkg en el REPL de julia presionando ]
 ```
 julia
 julia> ]
-(@v1.6) pkg> add Distances, ArgParse, Plots, DataFrames, StatsPlots
+(@v1.6) pkg> add Distances, ArgParse, Plots, DataFrames, StatsPlots, CSV
 ```
