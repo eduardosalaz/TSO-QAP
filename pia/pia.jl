@@ -135,9 +135,11 @@ function mainPia()
     pathRelative = "relativeValues" * instanceSize * ".pdf"
     savefig(pathRelative)
 
+    dfFixedTimes = filter(row -> !(row.FileNumber == 10), df)
+
     titleString = "Comparison of run time of batch size " *  instanceSize
-    @df df plot(:FileNumber, [:ΔtC, :ΔtLS], line = (:solid, 3), title = titleString, legend = :best,
-                xlabel = "Number of instance", ylabel = "Hundreds of Microseconds", labels = ["Constructive" "Local"], 
+    @df dfFixedTimes plot(:FileNumber, [:ΔtC, :ΔtLS], line = (:solid, 3), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Microseconds", labels = ["Constructive" "Local"], 
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
     pathTime = "times" * instanceSize * ".pdf"
     savefig(pathTime)

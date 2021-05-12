@@ -76,14 +76,14 @@ function parseFile(path::String, verbose::Bool)
     start = time_ns()
     Σ₁, locations₁, X₁ = localSearch(costM, Σ₀, locations₀, X₀, verbose, true)
     finish = time_ns()
-    Δt₁ = (finish - start) * 1e-5 # micro segundos
+    Δt₁ = (finish - start) * 1e-3 # micro segundos
     improvement = valorInicial - Σ₁
     return Σ₁, locations₁, X₁, Δt₁, improvement
 end
 
 function saveToFileLocalSearch(Σ, locations, X, Δt, improvement,name)
     Σ = trunc(Int, Σ)
-    time = string(Δt) * " hundrends of microseconds"
+    time = string(Δt) * " microseconds"
     firstline = string(Σ, base=10) * "\n"
     improv = "Improvement: " * string(improvement, base=10) * "\n"
     open(name, "w") do io

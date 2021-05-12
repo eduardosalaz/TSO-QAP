@@ -85,7 +85,7 @@ function parseFile(path, verbose, x)
         costM, X, iters,Σ = constructive(costM, X, iters, Σ, verbose)
     end
     finish = time_ns()
-    Δt = (finish - start) * 1e-5 # microsegundos
+    Δt = (finish - start) * 1e-3 # microsegundos
     if verbose
         println(Δt)
         printstyled(stdout, "End of Heuristic\n", color=:green)
