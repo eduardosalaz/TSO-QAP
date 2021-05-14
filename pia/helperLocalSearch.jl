@@ -64,6 +64,7 @@ end
 function parseFile(path::String, verbose::Bool)
     stream = open(path, "r")
     contents = read(stream, String) 
+    close(stream)
     Σ, locations, X, costMStr, Δt = split(contents, "\n")
     Σ₀ = parse(Int, Σ)
     valorInicial = copy(Σ₀)
