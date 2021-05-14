@@ -1,3 +1,5 @@
+using ArgParse, DelimitedFiles, Plots
+
 struct solucion
     locations::Vector{Int64}
     value::Int64
@@ -34,7 +36,7 @@ function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vec
     interLstWorstCurr1 = leastWorstCurrentMove.interchange1
     interLstWorstCurr2 = leastWorstCurrentMove.interchange2
     if (tabooList[interLstWorstCurr1] ≠ 0 || tabooList[interLstWorstCurr2] ≠ 0)
-        println("HEY IM NOT ALLOWED")
+        println("trying a better one")
         selectLeastWorst(currentNeighbourhood, tabooList)
     else
         return leastWorstCurrentMove
@@ -51,11 +53,9 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
     for iteracion in 1:100
         currentNeighbourhood = solucion[]
         for i in 1:length(currentLocations)
-            for j in 1:length(currentLocations)
-                if i ≠ j
-                    movement = move(costM, currentLocations, i,j)
-                    push!(currentNeighbourhood, movement)
-                end
+            for j in i+1:length(currentLocations)
+                movement = move(costM, currentLocations, i,j)
+                push!(currentNeighbourhood, movement)
             end
         end
         sort!(currentNeighbourhood, by = move -> move.value)
@@ -68,20 +68,22 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
         end
         allNegatives = all(<=(0), scores)
         if allNegatives
-            leastWorstCurrentMove= selectLeastWorst(currentNeighbourhood, tabooList)
+            leastWorstCurrentMove = selectLeastWorst(currentNeighbourhood, tabooList)
             currentLocations = leastWorstCurrentMove.locations
-            #println("Iteration $iteracion, currentLocations: ", currentLocations)
+            println("All negatives Iteration $iteracion, currentLocations: ", currentLocations)
             currValue = leastWorstCurrentMove.value
-            #println("Value: ", currValue)
+            println("Value: ", currValue)
             interLstWorstCurr1 = leastWorstCurrentMove.interchange1
             interLstWorstCurr2 = leastWorstCurrentMove.interchange2
-            #println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
+            println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
             moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-            tabooList[interLstWorstCurr1] = 5
-            tabooList[interLstWorstCurr2] = 5
+            tabooList[interLstWorstCurr1] = 4
+            tabooList[interLstWorstCurr2] = 4
+            println(tabooList)
+            println("----------------")
         else
             bestCurrentMove = popfirst!(currentNeighbourhood)
             if bestCurrentMove.locations == currentLocations
@@ -93,28 +95,32 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
                 bestValue = bestCurrentMove.value
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
-                #println("Iteration $iteracion, currentLocations: ", currentLocations)
-                #println("Value: ", bestValue)
-                #println("Swapped $interBestCurr1 and $interBestCurr2")
+                println("Iteration $iteracion, currentLocations: ", currentLocations)
+                println("Value: ", bestValue)
+                println("Swapped $interBestCurr1 and $interBestCurr2")
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-                tabooList[interBestCurr1] = 5
-                tabooList[interBestCurr2] = 5
+                tabooList[interBestCurr1] = 4
+                tabooList[interBestCurr2] = 4
+                println(tabooList)
+                println("----------------")
             elseif bestCurrentMove.value < bestValue &&(tabooList[interBestCurr1] ≠ 0 || tabooList[interBestCurr2] ≠ 0) # if best move matches aspiration criteria but not acceptation
                 bestValue = bestCurrentMove.value
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
-                #println("Iteration $iteracion, currentLocations: ", currentLocations)
-                #println("Value: ", bestValue)
-                #println("Swapped $interBestCurr1 and $interBestCurr2")
+                println("Iteration $iteracion, currentLocations: ", currentLocations)
+                println("Value: ", bestValue)
+                println("Swapped $interBestCurr1 and $interBestCurr2")
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-                tabooList[interBestCurr1] = 5
-                tabooList[interBestCurr2] = 5
+                tabooList[interBestCurr1] = 4
+                tabooList[interBestCurr2] = 4
+                println(tabooList)
+                println("----------------")
             end
         end
     end

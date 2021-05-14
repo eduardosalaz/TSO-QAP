@@ -16,22 +16,20 @@ function localSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
     bestValues = []
     improvement = false
     for i in 1:length(locations₀)
-        for j in 1:length(locations₀)
-            if j ≠ i
-                locations₁ = copy(locations₀)
-                locations₁[i] = locations₀[j]
-                locations₁[j] = locations₀[i]
-                X = decisionMatrix(locations₁)
-                Σ₁ = 0
-                indices = findall(x->x==1, X)
-                for indice in indices
-                    Σ₁ += costM[indice]
-                end
-                if Σ₁ < Σ₀
-                    improvement = true
-                    push!(bestLocations, locations₁)
-                    push!(bestValues, Σ₁)
-                end
+        for j in i+1:length(locations₀)
+            locations₁ = copy(locations₀)
+            locations₁[i] = locations₀[j]
+            locations₁[j] = locations₀[i]
+            X = decisionMatrix(locations₁)
+            Σ₁ = 0
+            indices = findall(x->x==1, X)
+            for indice in indices
+                Σ₁ += costM[indice]
+            end
+            if Σ₁ < Σ₀
+                improvement = true
+                push!(bestLocations, locations₁)
+                push!(bestValues, Σ₁)
             end
         end
     end
