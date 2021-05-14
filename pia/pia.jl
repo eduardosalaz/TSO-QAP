@@ -124,9 +124,9 @@ function mainPia()
         slicedPath = replace(path, ".dat" => "")
         slicedPath = replace(slicedPath, "con" => "ts")
         if Sys.isunix()
-            fullPath = "../" * pathSolsLS * "/" * slicedPath * ".dat"
+            fullPath = "../" * pathSolsTS * "/" * slicedPath * ".dat"
         else
-            fullPath = "..\\" * pathSolsLS * "\\" * slicedPath * ".dat"
+            fullPath = "..\\" * pathSolsTS * "\\" * slicedPath * ".dat"
         end
         saveToFileTS(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
     end
