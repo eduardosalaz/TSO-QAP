@@ -1,5 +1,4 @@
 using ArgParse, DelimitedFiles, Plots
-
 struct solucion
     locations::Vector{Int64}
     value::Int64
@@ -36,7 +35,7 @@ function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vec
     interLstWorstCurr1 = leastWorstCurrentMove.interchange1
     interLstWorstCurr2 = leastWorstCurrentMove.interchange2
     stuck = count(i->(i==0), tabooList)
-    if stuck == 1
+    if stuck == 1 || stuck == 0
         return true, solucion([],99999999999,1,2)
     end
     if (tabooList[interLstWorstCurr1] ≠ 0 || tabooList[interLstWorstCurr2] ≠ 0)
@@ -46,15 +45,18 @@ function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vec
     end
 end
 
-function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
+function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64}, verbose::Bool, number::Int64, full::Bool)
     valuesEvaluated = Int64[]
-    println("Start locations: ", locations₀)
     bestValue = copy(Σ₀)
     push!(valuesEvaluated, bestValue)
-    println("Current best value: ", bestValue)
+    if full
+        println("Start locations: ", locations₀)
+        println("Current best value: ", bestValue)
+    end
     bestLocations = copy(locations₀)
     currentLocations = copy(bestLocations)
-    tabooList = zeros(Int64, 10)
+    tabooList = zeros(Int64, number)
+    tabooTenure = number/2 - 1
     itersTaken = 1
     for iteracion in 1:100
         currentNeighbourhood = solucion[]
@@ -80,21 +82,22 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
                 break
             else
                 currentLocations = leastWorstCurrentMove.locations
-                println("Worse Iteration $iteracion, currentLocations: ", currentLocations)
                 currValue = leastWorstCurrentMove.value
-                #println("Value: ", currValue)
                 push!(valuesEvaluated, currValue)
                 interLstWorstCurr1 = leastWorstCurrentMove.interchange1
                 interLstWorstCurr2 = leastWorstCurrentMove.interchange2
-                println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
+                if verbose
+                    println("Worse Iteration $iteracion, currentLocations: ", currentLocations)
+                    println("Value: ", currValue)
+                    println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
+                    println("----------------")
+                end
                 moveds = findall(x->x≠0, tabooList)
                     for moved in moveds
                         tabooList[moved]= tabooList[moved] - 1
                     end
-                tabooList[interLstWorstCurr1] = 3
-                tabooList[interLstWorstCurr2] = 3
-                println(tabooList)
-                println("----------------")
+                tabooList[interLstWorstCurr1] = tabooTenure
+                tabooList[interLstWorstCurr2] = tabooTenure
                 itersTaken += 1
             end
         else
@@ -108,51 +111,56 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
                 bestValue = bestCurrentMove.value
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
-                println("Iteration $iteracion, currentLocations: ", currentLocations)
-                #println("Value: ", bestValue)
                 push!(valuesEvaluated, bestValue)
-                println("Swapped $interBestCurr1 and $interBestCurr2")
+                if verbose
+                    println("Iteration $iteracion, currentLocations: ", currentLocations)
+                    println("Value: ", bestValue)
+                    println("Swapped $interBestCurr1 and $interBestCurr2")
+                    println("----------------")
+                end
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-                tabooList[interBestCurr1] = 3
-                tabooList[interBestCurr2] = 3
-                println(tabooList)
-                println("----------------")
+                tabooList[interBestCurr1] = tabooTenure
+                tabooList[interBestCurr2] = tabooTenure
                 itersTaken += 1
             elseif bestCurrentMove.value < bestValue &&(tabooList[interBestCurr1] ≠ 0 || tabooList[interBestCurr2] ≠ 0) # if best move matches aspiration criteria but not acceptation
                 bestValue = bestCurrentMove.value
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
-                println("Iteration $iteracion, currentLocations: ", currentLocations)
-                #println("Value: ", bestValue)
+                if verbose
+                    println("Iteration $iteracion, currentLocations: ", currentLocations)
+                    println("Value: ", bestValue)
+                    println("Swapped $interBestCurr1 and $interBestCurr2")
+                    println("----------------")
+                end
                 push!(valuesEvaluated, bestValue)
-                println("Swapped $interBestCurr1 and $interBestCurr2")
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
                 if tabooList[interBestCurr1] ≠ 0
-                    tabooList[interBestCurr2] = 3
+                    tabooList[interBestCurr2] = tabooTenure
                 else
-                    tabooList[interBestCurr1] = 3
+                    tabooList[interBestCurr1] = tabooTenure
                 end
-                println(tabooList)
-                println("----------------")
                 itersTaken += 1
             end
         end
     end
     X = decisionMatrix(bestLocations)
-    Y = collect(1:itersTaken)
-    plot(Y, valuesEvaluated)
-    path = "aaaaaa.pdf"
-    savefig(path)
+    if full
+        Y = collect(1:itersTaken)
+        plot(Y, valuesEvaluated)
+        path = string(number) * "values.pdf"
+        savefig(path)
+    end
     return bestValue, bestLocations, X
+
 end
 
-function parseFile(path::String)
+function parseFileTS(path::String, verbose::Bool, numero::Int64, full::Bool)
     stream = open(path, "r")
     contents = read(stream, String)
     close(stream)
@@ -166,20 +174,113 @@ function parseFile(path::String)
     costM = [trunc(Int, parse(Float32,cost)) for cost in split(costMStr)]
     costM = reshape(costM, (length(locations₀), length(locations₀)))
     start = time_ns()
-    Σ₁, locations₁, X₁ = taboo(costM, Σ₀, locations₀)
+    Σ₁, locations₁, X₁ = tabooSearch(costM, Σ₀, locations₀, verbose, numero, full)
     finish = time_ns()
     Δt₁ = (finish - start) * 1e-3 # micro segundos
     improvement = valorInicial - Σ₁
+    println("New value: ", Σ₁)
+    println("New locations: ", locations₁)
+    println("Improvement: ", improvement)
     return Σ₁, locations₁, X₁, Δt₁, improvement
 end
 
-function main()
-    path = "10_con\\file1_con.dat"
-    Σ₁, locations₁, X₁, Δt₁, improvement = parseFile(path)
-    println("New value: ", Σ₁)
-    println("New locations: ", locations₁)
-    println("Time: ", Δt₁)
-    println("Improvement: ", improvement)
+function parse_commandline()
+    settings = ArgParseSettings()
+    @add_arg_table! settings begin
+    "path"
+        help = "Path to file or directory OF SOLUTIONS"
+        required = true
+    "--dir", "-d"
+        help = "Specify if a directory is to be read"
+        action = :store_true
+    "--verbose", "-v"
+        help = "Specify verbose output"
+        action = :store_true
+    "--save", "-s"
+        help = "Save solutions to files"
+        action = :store_true
+    end 
+    return parse_args(settings)
 end
 
-main()
+function saveToFileTS(Σ, locations, X, Δt, improvement, name)
+    Σ = trunc(Int, Σ)
+    time = string(Δt) * " microseconds"
+    firstline = string(Σ, base=10) * "\n"
+    improv = "Improvement: " * string(improvement, base=10) * "\n"
+    open(name, "w") do io
+        write(io, firstline)
+        writedlm(io, [locations], ' ')
+        writedlm(io, [X], ' ')
+        write(io, improv)
+        write(io, time)
+    end
+    printstyled(stdout, "Wrote to file\n", color=:green)
+end
+
+function mainTaboo()
+    parsed_args = parse_commandline()
+    directory = get(parsed_args, "dir", false)
+    verbose = get(parsed_args, "verbose", false)
+    save = get(parsed_args, "save", false)
+    mainPath = get(parsed_args, "path", "")
+
+    if Sys.isunix()
+        splittedPath= split(mainPath, '/')
+    else
+        splittedPath= split(mainPath, '\\')
+    end
+    numSolutions = splittedPath[2]
+    numeroSpliteado = split(numSolutions, "_")
+    numeroPerron = numeroSpliteado[1]
+    numero = parse(Int64, numeroSpliteado[1])
+
+    if !directory
+        fileName = splittedPath[3]
+    end
+
+    if save
+        pathSolsLS = numeroPerron * "_ts"
+        if !isdir(pathSolsLS)
+            mkdir(pathSolsLS)
+        end
+    end
+
+    if directory
+        #try
+            paths = readdir(mainPath)
+            cd(mainPath)
+            for path in paths
+                Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(path, verbose, numero, true)
+                if save
+                    slicedPath = replace(path, ".dat" => "")
+                    slicedPath = replace(slicedPath, "con" => "ts")
+                    if Sys.isunix()
+                        fullPath = "../" * pathSolsLS * "/" * slicedPath * ".dat"
+                    else
+                        fullPath = "..\\" * pathSolsLS * "\\" * slicedPath * ".dat"
+                    end
+                    saveToFileTS(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
+                end
+            end
+        #catch
+        #    @error "Invalid path for directory"
+        #end
+    else
+        #try
+        Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(mainPath, verbose, numero, true)
+            if save
+                slicedPath = replace(fileName, ".dat" => "")
+                slicedPath = replace(slicedPath, "con" => "ts")
+                if Sys.isunix()
+                    fullPath = pathSolsLS *  "\\" * slicedPath * ".dat"
+                else
+                    fullPath = pathSolsLS *  "/" * slicedPath * ".dat"
+                end
+                saveToFileTS(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
+            end
+        #catch
+            #@error "Invalid file name"
+        #end
+    end
+end
