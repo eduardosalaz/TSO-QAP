@@ -128,17 +128,16 @@ function mainLocalSearch()
     end
 
     numSolutions = splittedPath[2]
-    numeroSpliteado = split(numSolutions, 's')
+    numeroSpliteado = split(numSolutions, 'c')
     numero = numeroSpliteado[1]
-
     if !directory
         fileName = splittedPath[3]
     end
 
     if save
-        pathSols2opt = numero * "_ls"
-        if !isdir(pathSols2opt)
-            mkdir(pathSols2opt)
+        pathSolsLS = numero * "ls"
+        if !isdir(pathSolsLS)
+            mkdir(pathSolsLS)
         end
     end
 
@@ -152,9 +151,9 @@ function mainLocalSearch()
                     slicedPath = replace(path, ".dat" => "")
                     slicedPath = replace(slicedPath, "con" => "ls")
                     if Sys.isunix()
-                        fullPath = "../" * pathSols2opt * "/" * slicedPath * ".dat"
+                        fullPath = "../" * pathSolsLS * "/" * slicedPath * ".dat"
                     else
-                        fullPath = "..\\" * pathSols2opt * "\\" * slicedPath * ".dat"
+                        fullPath = "..\\" * pathSolsLS * "\\" * slicedPath * ".dat"
                     end
                     saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
                 end
@@ -169,9 +168,9 @@ function mainLocalSearch()
                 slicedPath = replace(fileName, ".dat" => "")
                 slicedPath = replace(slicedPath, "con" => "ls")
                 if Sys.isunix()
-                    fullPath = pathSols2opt *  "\\" * slicedPath * ".dat"
+                    fullPath = pathSolsLS *  "\\" * slicedPath * ".dat"
                 else
-                    fullPath = pathSols2opt *  "/" * slicedPath * ".dat"
+                    fullPath = pathSolsLS *  "/" * slicedPath * ".dat"
                 end
                 saveToFileLocalSearch(Σ₁, locations₁, X₁, Δt₁, improvement, fullPath)
             end

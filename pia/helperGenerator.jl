@@ -32,6 +32,7 @@ function generate(numLocations, instance, verbose)
         println()
         print("Flow matrix: ")
         show(stdout, "text/plain", flow)
+        println()
     end
     name = "file" * string(instance, base=10) # nombre de archivo de instancia actual
     # EN JULIA EL OPERADOR * ES PARA CONCATENAR STRINGS
@@ -44,7 +45,6 @@ function generate(numLocations, instance, verbose)
         writedlm(io, [distances], ' ')
         writedlm(io, [flow], ' ')
     end # escribimos al archivo nuestro numero de localizaciones, matrices de distancia y flujo
-    println()
 end
 
 function parse_commandline()
