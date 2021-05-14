@@ -31,25 +31,31 @@ function move(costM::Matrix{Int64}, locations₀::Vector{Int64}, i::Int64, j::In
     return solucion(locations₁,value,locations₁[i], locations₁[j])
 end
 
-function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vector{Int64})::solucion
+function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vector{Int64})
     leastWorstCurrentMove = popfirst!(currentNeighbourhood)
     interLstWorstCurr1 = leastWorstCurrentMove.interchange1
     interLstWorstCurr2 = leastWorstCurrentMove.interchange2
+    stuck = count(i->(i==0), tabooList)
+    if stuck == 1
+        return true, solucion([],99999999999,1,2)
+    end
     if (tabooList[interLstWorstCurr1] ≠ 0 || tabooList[interLstWorstCurr2] ≠ 0)
-        println("trying a better one")
         selectLeastWorst(currentNeighbourhood, tabooList)
     else
-        return leastWorstCurrentMove
+        return false, leastWorstCurrentMove
     end
 end
 
 function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
+    valuesEvaluated = Int64[]
     println("Start locations: ", locations₀)
     bestValue = copy(Σ₀)
+    push!(valuesEvaluated, bestValue)
     println("Current best value: ", bestValue)
     bestLocations = copy(locations₀)
     currentLocations = copy(bestLocations)
-    tabooList = zeros(Int64, 10)    
+    tabooList = zeros(Int64, 10)
+    itersTaken = 1
     for iteracion in 1:100
         currentNeighbourhood = solucion[]
         for i in 1:length(currentLocations)
@@ -68,22 +74,29 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
         end
         allNegatives = all(<=(0), scores)
         if allNegatives
-            leastWorstCurrentMove = selectLeastWorst(currentNeighbourhood, tabooList)
-            currentLocations = leastWorstCurrentMove.locations
-            println("All negatives Iteration $iteracion, currentLocations: ", currentLocations)
-            currValue = leastWorstCurrentMove.value
-            println("Value: ", currValue)
-            interLstWorstCurr1 = leastWorstCurrentMove.interchange1
-            interLstWorstCurr2 = leastWorstCurrentMove.interchange2
-            println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
-            moveds = findall(x->x≠0, tabooList)
-                for moved in moveds
-                    tabooList[moved]= tabooList[moved] - 1
-                end
-            tabooList[interLstWorstCurr1] = 4
-            tabooList[interLstWorstCurr2] = 4
-            println(tabooList)
-            println("----------------")
+            stuck, leastWorstCurrentMove = selectLeastWorst(currentNeighbourhood, tabooList)
+            if stuck
+                println("Taboo list is full, cant make any further move")
+                break
+            else
+                currentLocations = leastWorstCurrentMove.locations
+                println("Worse Iteration $iteracion, currentLocations: ", currentLocations)
+                currValue = leastWorstCurrentMove.value
+                #println("Value: ", currValue)
+                push!(valuesEvaluated, currValue)
+                interLstWorstCurr1 = leastWorstCurrentMove.interchange1
+                interLstWorstCurr2 = leastWorstCurrentMove.interchange2
+                println("Swapped $interLstWorstCurr1 and $interLstWorstCurr2")
+                moveds = findall(x->x≠0, tabooList)
+                    for moved in moveds
+                        tabooList[moved]= tabooList[moved] - 1
+                    end
+                tabooList[interLstWorstCurr1] = 3
+                tabooList[interLstWorstCurr2] = 3
+                println(tabooList)
+                println("----------------")
+                itersTaken += 1
+            end
         else
             bestCurrentMove = popfirst!(currentNeighbourhood)
             if bestCurrentMove.locations == currentLocations
@@ -96,35 +109,46 @@ function taboo(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64})
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
                 println("Iteration $iteracion, currentLocations: ", currentLocations)
-                println("Value: ", bestValue)
+                #println("Value: ", bestValue)
+                push!(valuesEvaluated, bestValue)
                 println("Swapped $interBestCurr1 and $interBestCurr2")
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-                tabooList[interBestCurr1] = 4
-                tabooList[interBestCurr2] = 4
+                tabooList[interBestCurr1] = 3
+                tabooList[interBestCurr2] = 3
                 println(tabooList)
                 println("----------------")
+                itersTaken += 1
             elseif bestCurrentMove.value < bestValue &&(tabooList[interBestCurr1] ≠ 0 || tabooList[interBestCurr2] ≠ 0) # if best move matches aspiration criteria but not acceptation
                 bestValue = bestCurrentMove.value
                 bestLocations = bestCurrentMove.locations
                 currentLocations = copy(bestLocations)
                 println("Iteration $iteracion, currentLocations: ", currentLocations)
-                println("Value: ", bestValue)
+                #println("Value: ", bestValue)
+                push!(valuesEvaluated, bestValue)
                 println("Swapped $interBestCurr1 and $interBestCurr2")
                 moveds = findall(x->x≠0, tabooList)
                 for moved in moveds
                     tabooList[moved]= tabooList[moved] - 1
                 end
-                tabooList[interBestCurr1] = 4
-                tabooList[interBestCurr2] = 4
+                if tabooList[interBestCurr1] ≠ 0
+                    tabooList[interBestCurr2] = 3
+                else
+                    tabooList[interBestCurr1] = 3
+                end
                 println(tabooList)
                 println("----------------")
+                itersTaken += 1
             end
         end
     end
     X = decisionMatrix(bestLocations)
+    Y = collect(1:itersTaken)
+    plot(Y, valuesEvaluated)
+    path = "aaaaaa.pdf"
+    savefig(path)
     return bestValue, bestLocations, X
 end
 
