@@ -2,7 +2,7 @@
 
 ## Ejecución del PIA
 
-Generador de Instancias del QAP, Heurística Constructiva y Heurística de Búsqueda Local
+Generador de Instancias del QAP, Heurística Constructiva, Heurística de Búsqueda Local y Búsqueda Tabú
 
 Probado en [Julia](https://julialang.org/downloads/) 1.6.0
 
