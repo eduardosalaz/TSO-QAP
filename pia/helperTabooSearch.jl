@@ -152,7 +152,7 @@ function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
     X = decisionMatrix(bestLocations)
     if full
         Y = collect(1:itersTaken)
-        plot(Y, valuesEvaluated)
+        plot(Y, valuesEvaluated, label = "Value of iteration", xlabel="# of iteration", ylabel="Objective function value", title="Taboo Search")
         path = string(number) * "values.pdf"
         savefig(path)
     end
