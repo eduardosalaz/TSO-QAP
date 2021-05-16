@@ -126,7 +126,7 @@ function parse_commandline()
 end
 
 function saveToFileConstructive(Σ, X, locations, Δt, costM,name)
-    time = string(Δt) * " hundreds of microseconds"
+    time = string(Δt) * " microseconds"
     Σ = trunc(Int, Σ)
     firstline = string(Σ, base=10) * "\n"
     open(name, "w") do io
