@@ -36,11 +36,11 @@ function mainPia()
     instanceSize = get(parsed_args, "instanceSize", "S") # S es el tamaño de la instancia default
     N = 0
     if instanceSize == "S"
-        N = 10
+        N = 20
     elseif instanceSize == "M"
-        N = 30
+        N = 40
     elseif instanceSize == "L"
-        N = 50
+        N = 70
     else
         @error "You must enter a S(mall), M(edium) or L(arge) Batch Size"
         exit(0)
@@ -111,14 +111,14 @@ function mainPia()
     else
         cd("..\\")
     end
-    println("------------TABOO SEARCH HEURISTIC------------")
+    println("------------TABU SEARCH HEURISTIC------------")
     cd(pathSolsCon)
     paths = readdir(pwd())
     for path in paths
         matchedNumber = match(r"\d{1,3}", path)
         number = matchedNumber.match
         number = parse(Int, number)
-        Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(path, false, N, false) # llamar parsefile de localSearch
+        Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(path, false, N, false) # llamar parsefile de tabuSearch
         results = Dict("FileNumber" => number, "ValueTS" => trunc(Int, Σ₁), "AbsImprovTS" => improvement, "ΔtTS" =>Δt₁)
         push!(arreglo3, results)
         slicedPath = replace(path, ".dat" => "")
@@ -155,29 +155,54 @@ function mainPia()
     df = df[!, [:FileNumber, :ValueC, :ΔtC, :ValueLS, :ΔtLS, :AbsImprovLS, :RelImprovLS, :ValueTS, :ΔtTS, :AbsImprovTS, :RelImprovTS]]
 
     println(df)
+
     titleString = "Comparison of absolute values of batch size " *  instanceSize
-    @df df plot(:FileNumber, [:ValueC, :ValueLS, :ValueTS], line = (:solid, 2), title = titleString, legend = :best,
-                xlabel = "Number of instance", ylabel = "Objective function value", labels = ["Constructive" "Local" "Taboo"], 
+    @df df plot(:FileNumber, [:ValueC], line = (:solid, 2), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Objective function value", label = "Constructive", 
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(1, :gray)))
+    @df df plot!(:FileNumber, [:ValueLS], line = (:dot, 2), title = titleString, legend = :best,
+    xlabel = "Number of instance", ylabel = "Objective function value", label = "Local", 
+    size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(1, :gray)))
     pathAbsolute = "absoluteValues" * instanceSize * ".pdf"
     savefig(pathAbsolute)
 
+    titleString = "Comparison of absolute values of batch size " *  instanceSize
+    @df df plot!(:FileNumber, [:ValueTS], line = (:dash, 2), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Objective function value", label = "Tabu", 
+                size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(1, :gray)))
+    pathAbsoluteTS = "absoluteValuesTS" * instanceSize * ".pdf"
+    savefig(pathAbsoluteTS)
+
     titleString = "Relative value improvement of batch size " *  instanceSize
-    @df df plot(:FileNumber, [:RelImprovLS, :RelImprovTS], line = (:solid, 2), title = titleString, legend = :best,
-                xlabel = "Number of instance", ylabel = "Percentage of improvement", labels = ["Local" "Taboo"],
+    @df df plot(:FileNumber, [:RelImprovLS], line = (:dot, 2), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Percentage of improvement", label = "Local",
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
     pathRelative = "relativeValues" * instanceSize * ".pdf"
     savefig(pathRelative)
 
+    titleString = "Relative value improvement of batch size " *  instanceSize
+    @df df plot!(:FileNumber, [:RelImprovTS], line = (:dash, 2), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Percentage of improvement", label= "Tabu",
+                size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
+    pathRelativeTS = "relativeValuesTS" * instanceSize * ".pdf"
+    savefig(pathRelativeTS)
+
     dfFixedTimes = filter(row -> !(row.FileNumber == 10), df)
 
     titleString = "Comparison of run time of batch size " *  instanceSize
-    @df dfFixedTimes plot(:FileNumber, [:ΔtC, :ΔtLS, :ΔtTS], line = (:solid, 2), title = titleString, legend = :best,
-                xlabel = "Number of instance", ylabel = "Microseconds", labels = ["Constructive" "Local" "Taboo"], 
+    @df dfFixedTimes plot(:FileNumber, [:ΔtC], line = (:solid, 2), title = titleString, legend = :best,
+                xlabel = "Number of instance", ylabel = "Microseconds", label = "Constructive", 
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
+    @df dfFixedTimes plot!(:FileNumber, [:ΔtLS], line = (:dot, 2), title = titleString, legend = :best,
+    xlabel = "Number of instance", ylabel = "Microseconds", label = "Local", 
+    size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
     pathTime = "times" * instanceSize * ".pdf"
     savefig(pathTime)
-
+    @df dfFixedTimes plot!(:FileNumber, [:ΔtTS], line = (:dash, 2), title = titleString, legend = :best,
+    xlabel = "Number of instance", ylabel = "Microseconds", label = "Tabu", 
+    size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
+    pathTimeTS = "timesTS" * instanceSize * ".pdf"
+    savefig(pathTimeTS)
     CSV.write("results.csv", df)
 end
 mainPia()

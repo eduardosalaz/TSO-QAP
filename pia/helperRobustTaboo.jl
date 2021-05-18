@@ -45,7 +45,7 @@ function selectLeastWorst(currentNeighbourhood::Vector{solucion}, tabooList::Vec
     end
 end
 
-function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64}, verbose::Bool, number::Int64, full::Bool, iters::Int64)
+function robustTabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{Int64}, verbose::Bool, number::Int64, full::Bool, iters::Int64)
     valuesEvaluated = Int64[]
     bestValue = copy(Σ₀)
     push!(valuesEvaluated, bestValue)
@@ -56,9 +56,15 @@ function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
     bestLocations = copy(locations₀)
     currentLocations = copy(bestLocations)
     tabooList = zeros(Int64, number)
-    tabooTenure = number/2 - 1
+    sₘᵢₙ = floor(Int, (0.9 * number))
+    sₘₐₓ = ceil(Int, (1.1 * number))
+    randomPeriod = 2 * sₘₐₓ
+    tabooTenure = rand(sₘᵢₙ:sₘₐₓ)
     itersTaken = 1
     for iteracion in 1:iters
+        if iteracion % randomPeriod == 0
+            tabooTenure = rand(sₘᵢₙ:sₘₐₓ)
+        end
         currentNeighbourhood = solucion[]
         for i in 1:length(currentLocations)
             for j in i+1:length(currentLocations)
@@ -93,9 +99,9 @@ function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
                     println("----------------")
                 end
                 moveds = findall(x->x≠0, tabooList)
-                    for moved in moveds
-                        tabooList[moved]= tabooList[moved] - 1
-                    end
+                for moved in moveds
+                    tabooList[moved]= tabooList[moved] - 1
+                end
                 tabooList[interLstWorstCurr1] = tabooTenure
                 tabooList[interLstWorstCurr2] = tabooTenure
                 itersTaken += 1
@@ -152,7 +158,7 @@ function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
     X = decisionMatrix(bestLocations)
     if full
         Y = collect(1:itersTaken)
-        plot(Y, valuesEvaluated, label = "Value of iteration", xlabel="# of iteration", ylabel="Objective function value", title="Tabu Search")
+        plot(Y, valuesEvaluated, label = "Value of iteration", xlabel="# of iteration", ylabel="Objective function value", title="Taboo Search")
         path = string(number) * "values.pdf"
         savefig(path)
     end
@@ -160,7 +166,7 @@ function tabooSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
 
 end
 
-function parseFileTS(path::String, verbose::Bool, numero::Int64, full::Bool, iters::Int64)
+function parseFileRTS(path::String, verbose::Bool, numero::Int64, full::Bool, iters::Int64)
     stream = open(path, "r")
     contents = read(stream, String)
     close(stream)
@@ -174,7 +180,7 @@ function parseFileTS(path::String, verbose::Bool, numero::Int64, full::Bool, ite
     costM = [trunc(Int, parse(Float32,cost)) for cost in split(costMStr)]
     costM = reshape(costM, (length(locations₀), length(locations₀)))
     start = time_ns()
-    Σ₁, locations₁, X₁ = tabooSearch(costM, Σ₀, locations₀, verbose, numero, full, iters)
+    Σ₁, locations₁, X₁ = robustTabooSearch(costM, Σ₀, locations₀, verbose, numero, full, iters)
     finish = time_ns()
     Δt₁ = (finish - start) * 1e-3 # micro segundos
     improvement = valorInicial - Σ₁

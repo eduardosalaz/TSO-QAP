@@ -20,6 +20,8 @@ function localSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
             locations₁ = copy(locations₀)
             locations₁[i] = locations₀[j]
             locations₁[j] = locations₀[i]
+            fac1 = locations₁[i]
+            fac2 = locations₁[j]
             X = decisionMatrix(locations₁)
             Σ₁ = 0
             indices = findall(x->x==1, X)
@@ -30,6 +32,9 @@ function localSearch(costM::Matrix{Int64}, Σ₀::Int64, locations₀::Vector{In
                 improvement = true
                 push!(bestLocations, locations₁)
                 push!(bestValues, Σ₁)
+            else
+                println("Swapped facilities $fac2 and $fac1")
+                println("No improvement to current value")
             end
         end
     end
@@ -73,6 +78,8 @@ function parseFile(path::String, verbose::Bool)
     costM = [trunc(Int, parse(Float32,cost)) for cost in split(costMStr)]
     costM = reshape(costM, (length(locations₀), length(locations₀)))
     start = time_ns()
+    println("Initial value: $Σ₀")
+    println("Initial list of facilities: $locations₀")
     Σ₁, locations₁, X₁ = localSearch(costM, Σ₀, locations₀, X₀, verbose, true)
     finish = time_ns()
     Δt₁ = (finish - start) * 1e-3 # micro segundos
