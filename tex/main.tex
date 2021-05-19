@@ -1,0 +1,111 @@
+\title{AlgorithmTemplate}
+\documentclass{article}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\makeatletter
+% Reinsert missing \algbackskip
+\def\algbackskip{\hskip-\ALG@thistlm}
+\makeatother
+
+\begin{document}
+    \begin{algorithm}
+    \caption{Constructive Heuristic}\label{cons}
+    \hspace*{\algorithmicindent} \textbf{Input: Cost matrix $C_{ij}$, Number of facilities $N$} \\
+    \hspace*{\algorithmicindent} \textbf{Output: Decision matrix $X_{ij}$, Value $\Sigma$ } 
+    \begin{algorithmic}[1]
+    \Procedure{constructive}{Cost matrix $C$}
+%    \Procedure{MyProcedure}{$x,y$}
+%     % Input:
+%     \Comment{Input: x}
+%     % Output:
+%     \Comment{Output:y}
+    \State $\textit{iteration} \gets \textit{1 }$
+    \While {$iteration < N$}
+        \State $\textit{$\Phi(_{ij})$} \gets  \textit{$C_{ij}, \forall_{ij} \in C$}$
+        \State $\textit{$x\star, y\star $} \gets \textit{argmin\{$\Phi(_{ij})$\}}$
+        \State $\textit{$minVal$} \gets \textit{$C_{x\star y\star}$}$
+        \State $\textbf{Remove row $x\star$ and column $y\star$ from $C$}$
+        \State $\textit{$X_{x\star y\star}$} \gets \textbf{1}$
+        \State $\textit{$\Sigma$} \gets \textit{$\Sigma + minVal$}$
+        \State $\textit{$iteration$} \gets \textit{$iteration + 1$}$
+    \EndWhile
+    \State $\textbf{Return $X$, $\Sigma$}$
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    
+    \begin{algorithm}
+    \caption{Build Facilities List}\label{helper}
+    \hspace*{\algorithmicindent} \textbf{Input: Decision matrix $X_{ij}$, Number of facilities $N$} \\
+    \hspace*{\algorithmicindent} \textbf{Output: List of facilities $L$[$0$...$N-1$]} 
+    \begin{algorithmic}[1]
+    \Procedure{buildFacList}{Decision Matrix $X$, $N$ facilities}
+    \State $\textit{List of facilities $L$} \gets \textit{$[$0$...$N-1$]$}$
+    \For {$x \in X$}
+        \If {$x == 1$}
+            \State $\textbf{Push to L } \textit{$x_i$}$
+        \EndIf
+    \EndFor
+    \State $\textbf{Return $L$}$
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+
+    
+    \begin{algorithm}
+    \caption{Tabu Search}\label{helper}
+    \hspace*{\algorithmicindent} \textbf{Input: Cost matrix $C_{ij}$, Number of iterations $N$, Initial List of facilities $L_0$, Initial Value $\Sigma_0$}, Number of facilities $num$\\
+    \hspace*{\algorithmicindent} \textbf{Output: List of facilities $L_1$, Value $\Sigma_1$, Decision Matrix $X$} 
+    \begin{algorithmic}[1]
+    \Procedure{tabuSearch}{Cost matrix $C$, $N$ iterations, List $L_0$ , Value $\Sigma_0$, Number of facilities $num$}
+    \State $\textit{$bestVal$} \gets \textit{$\Sigma_0$}$
+    \State $\textit{$currVal$} \gets \textit{$\Sigma_0$}$
+    \State $\textit{$bestFacs$} \gets \textit{$L_0$}$
+    \State $\textit{$currentFacs$} \gets \textit{$L_0$}$
+    \State $\textit{$tabuList$} \gets \textit{zeros($num$)}$
+    \State $\textit{$tabuTenure$} \gets \textit{$\frac{num}{2}$- 1}$
+    \For {$iter \in 1:N$}
+        \State $\textit{currentNeighbourhood} \gets \textit{[ ]}$
+        \For{$i \in 1:len(currentFacs)$}
+            \For{$j \in i+1:len(currentFacs)$}
+            \State $\textit{$movement$} \gets \textit{$Move($C$, $ currentFacs$, $ i$, $ j$)$}$
+            \State $\textbf{Push to $currentNeighbourhood$ $ movement$}$
+            \EndFor
+        \EndFor
+        \State $\textbf{Evaluate $currentNeighbourhood$}$
+        \If{a \textbf{movement} is better than $bestVal$}
+            \State $\textit{$bestVal$} \gets \textbf{movement.value}$
+            \State $\textit{$bestFacs$} \gets \textbf{movement.facs}$
+            \State $\textit{$currVal$} \gets \textbf{movement.value}$
+            \State $\textit{$currFacs$} \gets \textbf{movement.facs}$
+            \State $\textit{$facilitiesInterchanged$} \gets \textbf{movement.swapped}$
+            \State $\textbf{Decrement in 1 all the facilities marked in $tabuList$}$
+            \State $\textit{$tabuList[facilitiesInterchanged]$} \gets \textit{$tabuTenure$}$
+        \Else{}
+            \State $\textbf{Use the least worst movement available}$
+            \State $\textit{$currVal$} \gets \textbf{movement.value}$
+            \State $\textit{$currFacs$} \gets \textbf{movement.facs}$
+            \State $\textit{$facilitiesInterchanged$} \gets \textbf{movement.swapped}$
+            \State $\textbf{Decrement in 1 all the facilities marked in $tabuList$}$
+            \State $\textit{$tabuList[facilitiesInterchanged]$} \gets \textit{$tabuTenure$}$
+        \EndIf
+    \EndFor
+    \State $\textbf{Build the decision matrix $X$ according to the best facilities}$
+    \State $\textbf{Return $bestVal, bestFacs, X$}$
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    
+    $Freq = 2 * S_{max}$
+    
+    
+    
+    
+    
+
+\end{document} 
