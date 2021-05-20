@@ -1,9 +1,9 @@
 using ArgParse, DataFrames, StatsPlots, CSV
 gr() # para inicializar el backend de los plots
 
-include("helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
-include("helperLocalSearch.jl")
-include("helperConstructive.jl")
+include("include/helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
+include("include/helperLocalSearch.jl")
+include("include/helperConstructive.jl")
 
 function parse_commandlinePia() # lee los argumentos del programa y los procesa
     settings = ArgParseSettings()
@@ -26,19 +26,21 @@ function mkDir(path::String)
     end
 end
 
+
+
 function mainPia()
     arreglo1 = []
     arreglo2 = []
     parsed_args = parse_commandlinePia()
-    batchSize = get(parsed_args, "batchSize", 10) # 10 es el tamaño default
+    batchSize = get(parsed_args, "batchSize", 20) # 20 es el tamaño default
     instanceSize = get(parsed_args, "instanceSize", "S") # S es el tamaño de la instancia default
     N = 0
     if instanceSize == "S"
-        N = 10
+        N = 20
     elseif instanceSize == "M"
-        N = 30
+        N = 40
     elseif instanceSize == "L"
-        N = 50
+        N = 70
     else
         @error "You must enter a S(mall), M(edium) or L(arge) Batch Size"
         exit(0)

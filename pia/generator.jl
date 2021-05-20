@@ -1,3 +1,3 @@
-include("helperGenerator.jl")
+include("include/helperGenerator.jl")
 
 mainGenerator()

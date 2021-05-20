@@ -4,8 +4,8 @@ gr() # para inicializar el backend de los plots
 include("helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
 include("helperLocalSearch.jl")
 include("helperConstructive.jl")
-include("helperTabooSearch.jl")
-include("helperRobustTaboo.jl")
+include("helperTabuSearch.jl")
+include("helperRobustTabu.jl")
 
 function parse_commandlinePia() # lee los argumentos del programa y los procesa
     settings = ArgParseSettings()
@@ -141,7 +141,7 @@ function mainPiaComp()
         cd("..\\")
     end
 
-    plotsPath = instanceSize * "_RobustTaboo"
+    plotsPath = instanceSize * "_RobustTabu"
 
     mkDir(plotsPath)
     cd(plotsPath)

@@ -1,2 +1,0 @@
-include("helperTabooSearch.jl")
-mainTaboo()

@@ -1,10 +1,10 @@
 using ArgParse, DataFrames, StatsPlots, CSV
 gr() # para inicializar el backend de los plots
 
-include("helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
-include("helperLocalSearch.jl")
-include("helperConstructive.jl")
-include("helperTabooSearch.jl")
+include("include/helperGenerator.jl") # incluye los archivos que tienen las funciones que ocupamos
+include("include/helperLocalSearch.jl")
+include("include/helperConstructive.jl")
+include("include/helperTabuSearch.jl")
 
 function parse_commandlinePia() # lee los argumentos del programa y los procesa
     settings = ArgParseSettings()
@@ -31,8 +31,9 @@ function mainPia()
     arreglo1 = []
     arreglo2 = []
     arreglo3 = []
+    iters = 100 
     parsed_args = parse_commandlinePia()
-    batchSize = get(parsed_args, "batchSize", 10) # 10 es el tamaño default
+    batchSize = get(parsed_args, "batchSize", 20) # 20 es el tamaño default
     instanceSize = get(parsed_args, "instanceSize", "S") # S es el tamaño de la instancia default
     N = 0
     if instanceSize == "S"
@@ -46,6 +47,7 @@ function mainPia()
         exit(0)
     end
 
+    println("------------GENERATING FILES------------")
     mkDir(instanceSize)
 
     pathSolsCon = instanceSize * "_con"
@@ -118,7 +120,7 @@ function mainPia()
         matchedNumber = match(r"\d{1,3}", path)
         number = matchedNumber.match
         number = parse(Int, number)
-        Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(path, false, N, false) # llamar parsefile de tabuSearch
+        Σ₁, locations₁, X₁, Δt₁, improvement = parseFileTS(path, false, N, false, iters) # llamar parsefile de tabuSearch
         results = Dict("FileNumber" => number, "ValueTS" => trunc(Int, Σ₁), "AbsImprovTS" => improvement, "ΔtTS" =>Δt₁)
         push!(arreglo3, results)
         slicedPath = replace(path, ".dat" => "")
@@ -140,6 +142,7 @@ function mainPia()
 
     mkDir(plotsPath)
     cd(plotsPath)
+    println("------------FINAL RESULTS------------")
 
     df1 = vcat(DataFrame.(arreglo1)...) # https://stackoverflow.com/questions/54168574/an-array-of-dictionaries-into-a-dataframe-at-one-go-in-julia
     df2 = vcat(DataFrame.(arreglo2)...)
@@ -156,6 +159,8 @@ function mainPia()
 
     println(df)
 
+    println("------------PLOTTING RESULTS------------")
+
     titleString = "Comparison of absolute values of batch size " *  instanceSize
     @df df plot(:FileNumber, [:ValueC], line = (:solid, 2), title = titleString, legend = :best,
                 xlabel = "Number of instance", ylabel = "Objective function value", label = "Constructive", 
@@ -163,28 +168,28 @@ function mainPia()
     @df df plot!(:FileNumber, [:ValueLS], line = (:dot, 2), title = titleString, legend = :best,
     xlabel = "Number of instance", ylabel = "Objective function value", label = "Local", 
     size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(1, :gray)))
-    pathAbsolute = "absoluteValues" * instanceSize * ".pdf"
+    pathAbsolute = "absoluteValues_" * instanceSize * ".pdf"
     savefig(pathAbsolute)
 
     titleString = "Comparison of absolute values of batch size " *  instanceSize
     @df df plot!(:FileNumber, [:ValueTS], line = (:dash, 2), title = titleString, legend = :best,
                 xlabel = "Number of instance", ylabel = "Objective function value", label = "Tabu", 
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(1, :gray)))
-    pathAbsoluteTS = "absoluteValuesTS" * instanceSize * ".pdf"
+    pathAbsoluteTS = "absoluteValuesTS_" * instanceSize * ".pdf"
     savefig(pathAbsoluteTS)
 
     titleString = "Relative value improvement of batch size " *  instanceSize
     @df df plot(:FileNumber, [:RelImprovLS], line = (:dot, 2), title = titleString, legend = :best,
                 xlabel = "Number of instance", ylabel = "Percentage of improvement", label = "Local",
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
-    pathRelative = "relativeValues" * instanceSize * ".pdf"
+    pathRelative = "relativeValues_" * instanceSize * ".pdf"
     savefig(pathRelative)
 
     titleString = "Relative value improvement of batch size " *  instanceSize
     @df df plot!(:FileNumber, [:RelImprovTS], line = (:dash, 2), title = titleString, legend = :best,
                 xlabel = "Number of instance", ylabel = "Percentage of improvement", label= "Tabu",
                 size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
-    pathRelativeTS = "relativeValuesTS" * instanceSize * ".pdf"
+    pathRelativeTS = "relativeValuesTS_" * instanceSize * ".pdf"
     savefig(pathRelativeTS)
 
     dfFixedTimes = filter(row -> !(row.FileNumber == 10), df)
@@ -201,8 +206,10 @@ function mainPia()
     @df dfFixedTimes plot!(:FileNumber, [:ΔtTS], line = (:dash, 2), title = titleString, legend = :best,
     xlabel = "Number of instance", ylabel = "Microseconds", label = "Tabu", 
     size = (700,600), marker = ([:hex :d], 3, 0.8, Plots.stroke(3, :gray)))
-    pathTimeTS = "timesTS" * instanceSize * ".pdf"
+    pathTimeTS = "timesTS_" * instanceSize * ".pdf"
     savefig(pathTimeTS)
+    println("------------WRITING TO CSV------------")
     CSV.write("results.csv", df)
+    println("Done")
 end
 mainPia()
