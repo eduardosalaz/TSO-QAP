@@ -4,7 +4,7 @@
 
 QAP Instance Generator, Constructive and Local Search heuristics, Tabu Search Metaheuristics and Analysis tools
 
-Tested in [Julia](https://julialang.org/downloads/) 1.6.0, should work in the near and long term (as Julia 1.6 is a LTS version)
+Tested in [Julia](https://julialang.org/downloads/) 1.6.0, should work in the near and long term (Julia 1.6 is a LTS version)
 
 ## Dependencies
 
@@ -18,7 +18,7 @@ end
 ```
 this will ensure that Julia will search and install the project automatically every time.
 
-If this is not performed, then the Pkg mode must be accesed by entering ] inside Julia
+If this is not performed, then the Pkg mode must be accesed by entering ] inside Julia and every dependence manually added
 ```
 julia
 julia> ]
