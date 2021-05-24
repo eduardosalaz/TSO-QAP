@@ -20,7 +20,7 @@ this will ensure that Julia will search and install the project automatically ev
 
 If this is not performed, then the Pkg mode must be accesed by entering ] inside Julia and every dependence manually added
 ```
-julia
+$julia
 julia> ]
 (@v1.6) pkg> add Distances, ArgParse, Plots, DataFrames, StatsPlots, CSV
 ```
@@ -28,7 +28,7 @@ julia> ]
 ### PIA in a single run:
 In order to execute the PIA in a single file(includes tools for analysis and experimentation), one must run
 ```
-julia pia.jl
+$julia pia.jl
 ```
 using the flag of ```--help```:
 ```
@@ -48,7 +48,7 @@ There is also a version of the PIA without TS, in the file accordingly named.
 
 In order to execute the PIA sequentally, one must first run the instance generator
 ```
-julia generator.jl
+$julia generator.jl
 ```
 using the flag of ```--help```:
 ```
@@ -65,7 +65,7 @@ optional arguments:
 ```
 Afterwards, in order to run the heuristic constructive, the next must be entered and executed
 ```
-julia constructive.jl
+$julia constructive.jl
 ```
 using the flag of ```--help```:
 ```
@@ -82,7 +82,7 @@ optional arguments:
 ```
 To execute the local search heuristic, the next must be entered and executed
 ```
-julia localSearch.jl
+$julia localSearch.jl
 ```
 using the flag of ```--help```:
 ```
@@ -100,7 +100,7 @@ optional arguments:
 
 Finally, to run the Tabu search metaheuristic, the next must be entered and executed
 ```
-julia tabuSearch.jl
+$julia tabuSearch.jl
 ```
 using the flag of ```--help```:
 ```
