@@ -1,17 +1,38 @@
 # TSO-QAP
 
-## Ejecución del PIA
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eduardosalaz/tso-qap/main?urlpath=lab/HEAD)
 
-Generador de Instancias del QAP, Heurística Constructiva, Heurística de Búsqueda Local y Búsqueda Tabú
+## PIA execution
 
-Probado en [Julia](https://julialang.org/downloads/) 1.6.0
+QAP Instance Generator, Constructive and Local Search heuristics, Tabu Search Metaheuristics and Analysis tools
 
-### PIA en un solo archivo:
-Para ejecutar el PIA en un sólo archivo (para el análisis y experimentación) se ejecuta
+Tested in [Julia](https://julialang.org/downloads/) 1.6.0, should work in the near and long term (Julia 1.6 is a LTS version)
+
+## Dependencies
+
+In order to install the required dependencies specified by Project.toml.
+
+One recommendation is to create a ```startup.jl``` file in ```~\.julia\config``` and add the following lines
 ```
-julia pia.jl
+if isfile("Project.toml") && isfile("Manifest.toml")
+    Pkg.activate(".")
+end
 ```
-usando la bandera de ```--help```:
+this will ensure that Julia will search and install the project automatically every time.
+
+If this is not performed, then the Pkg mode must be accesed by entering ] inside Julia and every dependence manually added
+```
+$julia
+julia> ]
+(@v1.6) pkg> add Distances, ArgParse, Plots, DataFrames, StatsPlots, CSV
+```
+
+### PIA in a single run:
+In order to execute the PIA in a single file(includes tools for analysis and experimentation), one must run
+```
+$julia pia.jl
+```
+using the flag of ```--help```:
 ```
 usage: pia.jl [-h] batchSize instanceSize
 
@@ -23,13 +44,15 @@ optional arguments:
   -h, --help    show this help message and exit
 ```
 
-### PIA en archivos separados
+There is also a version of the PIA without TS, in the file accordingly named.
 
-Para ejecutar el PIA de manera secuencial, primero se debe de ejecutar el generador de instancias
+### PIA in individual files.
+
+In order to execute the PIA sequentally, one must first run the instance generator
 ```
-julia generator.jl
+$julia generator.jl
 ```
-usando la bandera de ```--help```:
+using the flag of ```--help```:
 ```
 usage: generator.jl [-v] [-h] nLocations nInstances
 
@@ -42,11 +65,11 @@ optional arguments:
   -v, --verbose  Specify verbose output
   -h, --help     show this help message and exit
 ```
-Posteriormente, para ejecutar la heurística constructiva se debe de ejecutar
+Afterwards, in order to run the heuristic constructive, the next must be entered and executed
 ```
-julia constructive.jl
+$julia constructive.jl
 ```
-usando la bandera de ```--help```:
+using the flag of ```--help```:
 ```
 usage: constructive.jl [-d] [-v] [-s] [-h] path
 
@@ -59,11 +82,11 @@ optional arguments:
   -s, --save     Save solutions to files
   -h, --help     show this help message and exit
 ```
-Por último, para ejecutar la heurística de búsqueda local se debe de ejecutar
+To execute the local search heuristic, the next must be entered and executed
 ```
-julia localSearch.jl
+$julia localSearch.jl
 ```
-usando la bandera de ```--help```:
+using the flag of ```--help```:
 ```
 usage: localSearch.jl [-d] [-v] [-s] [-h] path
 
@@ -76,21 +99,25 @@ optional arguments:
   -s, --save     Save solutions to files
   -h, --help     show this help message and exit
 ```
-## Dependencias
 
-Para instalar las dependencias del proyecto hay que activar el entorno especificado por Project.toml.
+Finally, to run the Tabu search metaheuristic, the next must be entered and executed
+```
+$julia tabuSearch.jl
+```
+using the flag of ```--help```:
+```
+usage: tabuSearch.jl [-d] [-v] [-s] [-h] path iters
 
-Una recomendación es añadir un archivo ```startup.jl``` en ```~\.julia\config``` e incluir
-```
-if isfile("Project.toml") && isfile("Manifest.toml")
-    Pkg.activate(".")
-end
-```
-de esta forma, cada vez que se inicie Julia, buscará el entorno apropiado para el proyecto y lo instalará automáticamente.
+positional arguments:
+  path           Path to file or directory OF SOLUTIONS
+  iters          Number of iterations before stopping
 
-De otra forma, hay que entrar al modo de Pkg en el REPL de julia presionando ]
+optional arguments:
+  -d, --dir      Specify if a directory is to be read
+  -v, --verbose  Specify verbose output
+  -s, --save     Save solutions to files
+  -h, --help     show this help message and exit
 ```
-julia
-julia> ]
-(@v1.6) pkg> add Distances, ArgParse, Plots, DataFrames, StatsPlots, CSV
-```
+
+## Additional work
+This code is available online on [an online repository](https://github.com/eduardosalaz/TSO-QAP). In this repository a Jupyter Lab will be prepared so anyone can access and run the project without having to install Julia on their personal computers. It will take a few days (As of May 23rd 2021) but it should be up and running relatively soon. The simulated annealing metaheuristic and long term memory component of TS are also expected to be completed on the coming months.
