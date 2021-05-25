@@ -1,5 +1,7 @@
 # TSO-QAP
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eduardosalaz/tso-qap/main?urlpath=lab/HEAD)
+
 ## PIA execution
 
 QAP Instance Generator, Constructive and Local Search heuristics, Tabu Search Metaheuristics and Analysis tools
