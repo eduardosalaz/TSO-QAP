@@ -1,6 +1,6 @@
 # TSO-QAP
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eduardosalaz/tso-qap/main?urlpath=lab/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/eduardosalaz/tso-qap/main?urlpath=lab)
 
 ## PIA execution
 
